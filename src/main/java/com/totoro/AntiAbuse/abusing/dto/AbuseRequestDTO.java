@@ -6,7 +6,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.util.StringUtils;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
