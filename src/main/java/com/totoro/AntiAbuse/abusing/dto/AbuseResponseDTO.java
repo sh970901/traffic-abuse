@@ -8,6 +8,9 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AbuseResponseDTO {
     private boolean block;
+    private String blockTime;
+    private String remainLimit;
+    private String message;
 
     private AbuseResponseDTO(Boolean block){
         this.block = block;

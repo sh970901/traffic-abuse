@@ -1,14 +1,16 @@
 package com.totoro.AntiAbuse.abusing.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.totoro.AntiAbuse.abusing.Utils;
+import com.totoro.AntiAbuse.Utils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
 @ToString
 public class AbuseRequestDTO {
     private String pcId;
@@ -38,6 +40,15 @@ public class AbuseRequestDTO {
         this.userAgent = userAgent;
         this.domain = domain;
     }
+
+    public String generateKey() {
+        String key = this.remoteAddr + "::" + this.url;
+        if (this.pcId != null && !this.pcId.isEmpty()) {
+            key += "::" + this.pcId;
+        }
+        return key;
+    }
+
 
     @Override
     public String toString() {

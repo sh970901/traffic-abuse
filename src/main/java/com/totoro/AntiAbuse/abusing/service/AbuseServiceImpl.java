@@ -5,6 +5,8 @@ import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
+// https://www.mimul.com/blog/about-rate-limit-algorithm/
+// Sliding Window Counter 수식 참고
 @Service
 public class AbuseServiceImpl implements AbuseService{
     @Override

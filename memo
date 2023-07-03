@@ -5,3 +5,6 @@ refactor: 리팩토링 (소스코드 가독성과 변수명 변경, 코드 스�
 docs: 문서 (문서 추가, 수정 삭제)
 test: 테스트 (테스트코드 추가, 수정 삭제 : 비즈니스 로직에 변경 없음)
 etc: 기타 변경사항 (빌드 스크립트 수정, 단순 파일추가 등)
+
+<API 요청 데이터>
+요청값을 AbuseRequestDTO로 받거나 httpServletRequest로 받아 처리
