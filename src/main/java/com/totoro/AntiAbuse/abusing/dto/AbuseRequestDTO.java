@@ -1,17 +1,15 @@
 package com.totoro.AntiAbuse.abusing.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.totoro.AntiAbuse.Utils;
+import com.totoro.AntiAbuse.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-@ToString
 public class AbuseRequestDTO {
     private String pcId;
     private String fsId;
@@ -26,8 +24,8 @@ public class AbuseRequestDTO {
 
         Cookie[] cookies = request.getCookies();
         if(cookies != null){
-            pcId = Utils.CookieUtils.getCookieValue(cookies,"pcid");
-            fsId = Utils.CookieUtils.getCookieValue(cookies,"fsid");
+            pcId = CookieUtils.getCookieValue(cookies,"pcid");
+            fsId = CookieUtils.getCookieValue(cookies,"fsid");
         }
         return new AbuseRequestDTO(pcId, fsId, request.getRemoteAddr(), request.getRequestURI(), request.getHeader("User-Agent"), request.getServerName());
     }

@@ -1,8 +1,8 @@
-package com.totoro.AntiAbuse.abusing.domain;
+package com.totoro.AntiAbuse.abusing.tools.storage;
 
 import java.time.LocalDateTime;
 
-public interface LimitStore {
+public interface AbuseLimitStore {
     void incrementKey(String message, LocalDateTime window) throws Exception;
     long[] get(String message, LocalDateTime previousWindow, LocalDateTime currentWindow) throws Exception;
 }

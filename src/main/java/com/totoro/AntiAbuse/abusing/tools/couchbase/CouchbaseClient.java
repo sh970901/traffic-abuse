@@ -1,24 +1,21 @@
-package com.totoro.AntiAbuse.abusing.domain;
+package com.totoro.AntiAbuse.abusing.tools.couchbase;
 
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.Scope;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
-import com.couchbase.client.java.kv.MutateInOptions;
 import com.couchbase.client.java.kv.MutateInSpec;
-import com.couchbase.client.java.kv.ReplaceOptions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.totoro.AntiAbuse.abusing.tools.storage.AbuseLimit;
+import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
+import com.totoro.AntiAbuse.abusing.tools.storage.AbuseRule;
+import com.totoro.AntiAbuse.abusing.tools.storage.Blacklist;
 import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.List;
 
 @Component
 public class CouchbaseClient {

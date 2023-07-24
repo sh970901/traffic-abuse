@@ -1,17 +1,14 @@
 package com.totoro.AntiAbuse.abusing.service;
 
 import com.totoro.AntiAbuse.abusing.AbuseContext;
-import com.totoro.AntiAbuse.abusing.RequestUtils;
+import com.totoro.AntiAbuse.abusing.tools.storage.LimitStatus;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
-import com.totoro.AntiAbuse.abusing.domain.CouchbaseClient;
-import com.totoro.AntiAbuse.abusing.domain.LimitStatus;
-import com.totoro.AntiAbuse.abusing.domain.RateLimiter;
+import com.totoro.AntiAbuse.abusing.tools.couchbase.CouchbaseClient;
+import com.totoro.AntiAbuse.abusing.core.RateLimiter;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDTO;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,108 +20,138 @@ import static com.totoro.AntiAbuse.abusing.RequestUtils.*;
 // Sliding Window Counter 수식 참고
 @Service
 @RequiredArgsConstructor
-public class AbuseServiceImpl implements AbuseService{
+public class  AbuseServiceImpl implements AbuseService<String>{
 
     private final RateLimiter commonRateLimiter;
-    Map<String, RateLimiter> rateLimiters = new HashMap<>();
+    private final CouchbaseClient cbClient;
+    private Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
-    public AbuseResponseDTO checkAbuse(HttpServletRequest request) throws Exception {
+    public AbuseResponseDTO<String> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDTO requestDTO = AbuseRequestDTO.of(request);
-        check(requestDTO);
-        return null;
+        return check(requestDTO);
     }
 
     @Override
-    public AbuseResponseDTO checkAbuse(AbuseRequestDTO requestDTO) throws Exception {
-        check(requestDTO);
-        return null;
+    public AbuseResponseDTO<String> checkAbuse(AbuseRequestDTO requestDTO) throws Exception {
+        return check(requestDTO);
     }
 
     //ToDo response from 데이터 만들기
-    private String check(AbuseRequestDTO req) throws Exception {
-        RateLimiter rateLimiter = commonRateLimiter;
-        CouchbaseClient cbClient = new CouchbaseClient();
+    private AbuseResponseDTO<String> check(AbuseRequestDTO req) throws Exception {
 
+        RateLimiter rateLimiter = findRateLimiter(req);
+        if(rateLimiter == null) rateLimiter = commonRateLimiter;
 
-        if (rateLimiters.containsKey(req.getDomain())) {
-            RateLimiter val  = rateLimiters.get(req.getDomain());
-
-            if (val.getUrls().containsKey(req.getUrl())) {
-                rateLimiter = val;
-            }
-        }
 
         if (isWhiteUserAgent(req.getUserAgent())) {
-            return "ok";
+            return AbuseResponseDTO.<String>from()
+                                   .block(false)
+                                   .data("PASS: WhiteUserAgent")
+                                   .build();
         }
 
-        if (req.getUserAgent() == null || isBlackUserAgent(req.getUserAgent())) {
-            AbuseLog l = new AbuseLog(req, req.getUserAgent());
-//            cbClient.addLog(l);
-            AbuseResponseDTO abuse = AbuseResponseDTO.abuse();
-            return "ok";
+        if(isBlackOrNullUser(req)){
+            AbuseLog log = new AbuseLog(req, req.getUserAgent());
+            cbClient.addLog(log);
+            return AbuseResponseDTO.<String>from()
+                                    .block(true)
+                                    .data("Block: BlackUserAgent")
+                                    .build();
         }
 
-        if (req.getPcId() == null && req.getFsId() == null) {
-            AbuseLog l = new AbuseLog(req, AbuseContext.FIRST_VISIT);
-            int firstVisitLimit = 10;
-            if (cbClient.exist(l.generateId())) {
-//                VisitCountDoc doc =
-                AbuseLog firstVisit = cbClient.getFirstVisit(l.generateId());
-                if (firstVisit != null && firstVisit.getCount() > firstVisitLimit) {
-                    l.setCount(firstVisitLimit);
-                    cbClient.addLog(l);
-                    // res.setBlock(true);
-                    // res.setMessage("첫 방문 형태로 계속 요청");
-                    // return ResponseEntity.ok(res);
-                } else {
-                    cbClient.addFirstVisit(l);
-                }
-            } else {
-                cbClient.addFirstVisit(l);
-            }
+        if(!ipVaildCheck(req)){
+            AbuseLog log = new AbuseLog(req, "IpWrong");
+            cbClient.addLog(log);
+            return AbuseResponseDTO.<String>from()
+                                    .block(true)
+                                    .data("Block: InValidIp")
+                                    .build();
         }
 
-// IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
-//        if (req.getFsId() != null && req.getPcId() == null) {
-//            AbuseLog l = new AbuseLog(req, unusualFs);
-//            cbClient.addLog(l);
-//            // res.setBlock(true);
-//            return ResponseEntity.ok(res);
-//        }
-        if (req.getPcId() != null && req.getFsId() != null) {
-            if (req.getFsId().length() == 20) {
-                LocalDateTime fsIdTime = timestampToTime(req.getFsId().substring(0, 6));
+        handleFirstVisit(req, cbClient);
 
-                if (!isIpv4Net(req.getFsId().substring(6, 14))) {
-                    AbuseLog l = new AbuseLog(req, "ipWrong");
-                    cbClient.addLog(l);
-                    // res.setBlock(true);
-                    return "ok";
-                }
-                // var userAgent = req.getFsId().substring(14, 19);
-            } else {
-                AbuseLog l = new AbuseLog(req, "lenWrong");
-                cbClient.addLog(l);
-                // res.setBlock(true);
-                return "ok";
-            }
+//      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
+        if(isNullPcId(req)){
+            AbuseLog log = new AbuseLog(req, "unusualFs");
+            cbClient.addLog(log);
+            return AbuseResponseDTO.<String>from()
+                                   .block(false)
+                                   .data("PASS: NoPcId but IE Bug")
+                                   .build();
         }
+
 
         String key = req.generateKey();
         LimitStatus limitStatus = rateLimiter.check(key);
 
         if (limitStatus.isLimited()) {
-            AbuseLog l = new AbuseLog(req, "limited");
-            cbClient.addLog(l);
-//            res.setBlock(true);
-//            res.setBlockTime(Long.toString(limitStatus.getLimitDuration().toMillis()));
+            AbuseLog log = new AbuseLog(req, "limited");
+            cbClient.addLog(log);
+            return AbuseResponseDTO.<String>from()
+                                   .block(true)
+                                   .blockTime(Long.toString(limitStatus.getLimitDuration().toMillis()))
+                                   .data("Block: RateLimiter")
+                                   .build();
+
         } else {
             rateLimiter.incrementKey(key);
-//            res.setBlock(false);
-//            res.setRemainLimit(Long.toString(limitStatus.getCurrentRemainRequests()));
+            return AbuseResponseDTO.<String>from()
+                                   .block(false)
+                                   .blockTime(Long.toString(limitStatus.getLimitDuration().toMillis()))
+                                   .data("Block: RateLimiter")
+                                   .build();
         }
+    }
 
-        return "";
+    private boolean ipVaildCheck(AbuseRequestDTO req) {
+        String fsId = req.getFsId();
+        if (req.getPcId() != null && fsId != null && fsId.length() == 20) {
+            String ipAddress = fsId.substring(6, 14);
+            return isIpv4Net(ipAddress);
+        }
+        return false;
+    }
+
+    private Boolean isNullPcId(AbuseRequestDTO req) {
+        if (req.getFsId() != null && req.getPcId() == null) {
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean isBlackOrNullUser(AbuseRequestDTO req) {
+        if (req.getUserAgent() == null || isBlackUserAgent(req.getUserAgent())) {
+            return true;
+        }
+        return false;
+    }
+
+    private RateLimiter findRateLimiter(AbuseRequestDTO req) {
+        if (rateLimiters.containsKey(req.getDomain())) {
+            RateLimiter val = rateLimiters.get(req.getDomain());
+            if (val.getUrls().containsKey(req.getUrl())) {
+                return val;
+            }
+        }
+        return null;
+    }
+
+    private void handleFirstVisit(AbuseRequestDTO req, CouchbaseClient cbClient) {
+        if (req.getPcId() == null && req.getFsId() == null) {
+            AbuseLog log = new AbuseLog(req, AbuseContext.FIRST_VISIT);
+
+            int firstVisitLimit = 10;
+            if (cbClient.exist(log.generateId())) {
+                AbuseLog firstVisit = cbClient.getFirstVisit(log.generateId());
+                if (firstVisit != null && firstVisit.getCount() > firstVisitLimit) {
+                    log.setCount(firstVisitLimit);
+                    cbClient.addLog(log);
+                } else {
+                    cbClient.addFirstVisit(log);
+                }
+            } else {
+                cbClient.addFirstVisit(log);
+            }
+        }
     }
 }

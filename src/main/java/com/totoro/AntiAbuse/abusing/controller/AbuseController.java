@@ -1,6 +1,6 @@
 package com.totoro.AntiAbuse.abusing.controller;
 
-import com.totoro.AntiAbuse.abusing.domain.RateLimiter;
+import com.totoro.AntiAbuse.abusing.core.RateLimiter;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDTO;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
 import com.totoro.AntiAbuse.abusing.service.AbuseService;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.Enumeration;
 
 @RestController
 @RequestMapping(value = "/v2")
@@ -32,7 +31,7 @@ public class AbuseController {
     }
 
     @PostMapping("/check-abuse3")
-    public AbuseResponseDTO dtoCheckAbuse(AbuseRequestDTO requestDTO){
+    public AbuseResponseDTO dtoCheckAbuse(AbuseRequestDTO requestDTO) throws Exception {
         AbuseResponseDTO responseDTO = abuseService.checkAbuse(requestDTO);
         return responseDTO;
     }

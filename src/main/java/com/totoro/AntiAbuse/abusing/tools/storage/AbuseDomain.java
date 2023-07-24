@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing.domain;
+package com.totoro.AntiAbuse.abusing.tools.storage;
 
 import java.util.List;
 

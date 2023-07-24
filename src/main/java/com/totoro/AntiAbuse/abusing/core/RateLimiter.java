@@ -1,23 +1,23 @@
-package com.totoro.AntiAbuse.abusing.domain;
+package com.totoro.AntiAbuse.abusing.core;
 
+import com.totoro.AntiAbuse.abusing.tools.storage.AbuseLimitStore;
+import com.totoro.AntiAbuse.abusing.tools.storage.LimitStatus;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Map;
 
 @Component
 @Getter
 public class RateLimiter {
-    private LimitStore dataStore;
+    private AbuseLimitStore dataStore;
     private int requestsLimit;
     private Duration windowSize;
     private Map<String, Integer> urls;
 
-    public RateLimiter(LimitStore dataStore, int requestsLimit, Map<String, Integer> urls) {
+    public RateLimiter(AbuseLimitStore dataStore, int requestsLimit, Map<String, Integer> urls) {
         this.dataStore = dataStore;
         this.requestsLimit = requestsLimit;
         this.windowSize = Duration.ofMinutes(1); // 1분 단위로 윈도우 크기 설정
