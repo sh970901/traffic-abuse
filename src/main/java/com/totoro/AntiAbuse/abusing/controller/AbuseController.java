@@ -9,12 +9,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 
 @RestController
+@RequestMapping(value = "/v2")
 @RequiredArgsConstructor
 @Slf4j
 public class AbuseController {
@@ -22,24 +24,15 @@ public class AbuseController {
 
     private final RateLimiter commonRateLimiter;
 
-    @PostMapping("/v1/check-abuse")
-    public String getRequestHeader(HttpServletRequest request){
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-        }
-        return "1";
-    }
 
-    @PostMapping("/v2/check-abuse")
-    public AbuseResponseDTO checkAbuse2(HttpServletRequest request){
+    @PostMapping("/check-abuse")
+    public AbuseResponseDTO httpCheckAbuse(HttpServletRequest request) throws Exception {
         AbuseResponseDTO responseDTO = abuseService.checkAbuse(request);
         return responseDTO;
     }
 
-    @PostMapping("/v3/check-abuse")
-    public AbuseResponseDTO checkAbuse2(AbuseRequestDTO requestDTO){
+    @PostMapping("/check-abuse3")
+    public AbuseResponseDTO dtoCheckAbuse(AbuseRequestDTO requestDTO){
         AbuseResponseDTO responseDTO = abuseService.checkAbuse(requestDTO);
         return responseDTO;
     }

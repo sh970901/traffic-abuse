@@ -5,6 +5,6 @@ import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface AbuseService {
-    AbuseResponseDTO checkAbuse(HttpServletRequest request);
-    AbuseResponseDTO checkAbuse(AbuseRequestDTO requestDTO);
+    AbuseResponseDTO checkAbuse(HttpServletRequest request) throws Exception;
+    AbuseResponseDTO checkAbuse(AbuseRequestDTO requestDTO) throws Exception;
 }

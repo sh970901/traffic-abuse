@@ -4,10 +4,12 @@ import com.totoro.AntiAbuse.abusing.AbuseContext;
 import com.totoro.AntiAbuse.abusing.RequestUtils;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
 import com.totoro.AntiAbuse.abusing.domain.CouchbaseClient;
+import com.totoro.AntiAbuse.abusing.domain.LimitStatus;
 import com.totoro.AntiAbuse.abusing.domain.RateLimiter;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDTO;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,28 +26,31 @@ import static com.totoro.AntiAbuse.abusing.RequestUtils.*;
 public class AbuseServiceImpl implements AbuseService{
 
     private final RateLimiter commonRateLimiter;
-    Map<String, Map<String, RateLimiter>> rateLimiters = new HashMap<>();
+    Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
-    public AbuseResponseDTO checkAbuse(HttpServletRequest request) {
+    public AbuseResponseDTO checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDTO requestDTO = AbuseRequestDTO.of(request);
         check(requestDTO);
         return null;
     }
 
     @Override
-    public AbuseResponseDTO checkAbuse(AbuseRequestDTO requestDTO) {
+    public AbuseResponseDTO checkAbuse(AbuseRequestDTO requestDTO) throws Exception {
+        check(requestDTO);
         return null;
     }
 
     //ToDo response from 데이터 만들기
-    private String check(AbuseRequestDTO req){
+    private String check(AbuseRequestDTO req) throws Exception {
         RateLimiter rateLimiter = commonRateLimiter;
+        CouchbaseClient cbClient = new CouchbaseClient();
+
 
         if (rateLimiters.containsKey(req.getDomain())) {
-            Map<String, RateLimiter> val = rateLimiters.get(req.getDomain());
+            RateLimiter val  = rateLimiters.get(req.getDomain());
 
-            if (val.containsKey(req.getUrl())) {
-                rateLimiter = val.get(req.getUrl());
+            if (val.getUrls().containsKey(req.getUrl())) {
+                rateLimiter = val;
             }
         }
 
@@ -61,7 +66,6 @@ public class AbuseServiceImpl implements AbuseService{
         }
 
         if (req.getPcId() == null && req.getFsId() == null) {
-            CouchbaseClient cbClient = new CouchbaseClient();
             AbuseLog l = new AbuseLog(req, AbuseContext.FIRST_VISIT);
             int firstVisitLimit = 10;
             if (cbClient.exist(l.generateId())) {
@@ -79,6 +83,46 @@ public class AbuseServiceImpl implements AbuseService{
             } else {
                 cbClient.addFirstVisit(l);
             }
+        }
+
+// IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
+//        if (req.getFsId() != null && req.getPcId() == null) {
+//            AbuseLog l = new AbuseLog(req, unusualFs);
+//            cbClient.addLog(l);
+//            // res.setBlock(true);
+//            return ResponseEntity.ok(res);
+//        }
+        if (req.getPcId() != null && req.getFsId() != null) {
+            if (req.getFsId().length() == 20) {
+                LocalDateTime fsIdTime = timestampToTime(req.getFsId().substring(0, 6));
+
+                if (!isIpv4Net(req.getFsId().substring(6, 14))) {
+                    AbuseLog l = new AbuseLog(req, "ipWrong");
+                    cbClient.addLog(l);
+                    // res.setBlock(true);
+                    return "ok";
+                }
+                // var userAgent = req.getFsId().substring(14, 19);
+            } else {
+                AbuseLog l = new AbuseLog(req, "lenWrong");
+                cbClient.addLog(l);
+                // res.setBlock(true);
+                return "ok";
+            }
+        }
+
+        String key = req.generateKey();
+        LimitStatus limitStatus = rateLimiter.check(key);
+
+        if (limitStatus.isLimited()) {
+            AbuseLog l = new AbuseLog(req, "limited");
+            cbClient.addLog(l);
+//            res.setBlock(true);
+//            res.setBlockTime(Long.toString(limitStatus.getLimitDuration().toMillis()));
+        } else {
+            rateLimiter.incrementKey(key);
+//            res.setBlock(false);
+//            res.setRemainLimit(Long.toString(limitStatus.getCurrentRemainRequests()));
         }
 
         return "";

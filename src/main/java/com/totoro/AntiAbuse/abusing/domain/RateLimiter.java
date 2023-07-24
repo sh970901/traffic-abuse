@@ -1,5 +1,6 @@
 package com.totoro.AntiAbuse.abusing.domain;
 
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -9,6 +10,7 @@ import java.time.ZoneOffset;
 import java.util.Map;
 
 @Component
+@Getter
 public class RateLimiter {
     private LimitStore dataStore;
     private int requestsLimit;

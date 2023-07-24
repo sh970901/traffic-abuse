@@ -22,13 +22,12 @@ public class AbuseLog {
     private String mbId;
     private String pcId;
     private String fsId;
-    private String fsId1;
     private String remoteAddr;
     private String url;
     private String userAgent;
     private String domain;
-    public AbuseLog(AbuseRequestDTO req, String userAgent) {
-        createNewLog(req, userAgent);
+    public AbuseLog(AbuseRequestDTO req, String type) {
+        createNewLog(req, type);
     }
     public AbuseLog() {
 
