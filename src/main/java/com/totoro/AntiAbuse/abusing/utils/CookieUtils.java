@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.utils;
+package com.totoro.AntiAbuse.abusing.utils;
 
 import jakarta.servlet.http.Cookie;
 

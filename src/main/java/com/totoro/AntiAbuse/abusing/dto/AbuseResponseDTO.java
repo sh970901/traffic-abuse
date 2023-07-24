@@ -2,13 +2,11 @@ package com.totoro.AntiAbuse.abusing.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.totoro.AntiAbuse.utils.TotoroToStringStyle;
+import com.totoro.AntiAbuse.abusing.utils.TotoroToStringStyle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Data

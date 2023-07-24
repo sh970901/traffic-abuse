@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.totoro.AntiAbuse.abusing.RequestUtils.*;
+import static com.totoro.AntiAbuse.abusing.utils.RequestUtils.*;
 
 // https://www.mimul.com/blog/about-rate-limit-algorithm/
 // Sliding Window Counter 수식 참고
