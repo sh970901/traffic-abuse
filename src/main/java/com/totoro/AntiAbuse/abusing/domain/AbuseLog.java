@@ -1,7 +1,7 @@
 package com.totoro.AntiAbuse.abusing.domain;
 
 import com.couchbase.client.core.deps.com.google.gson.JsonObject;
-import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDTO;
+import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -26,7 +26,7 @@ public class AbuseLog {
     private String url;
     private String userAgent;
     private String domain;
-    public AbuseLog(AbuseRequestDTO req, String type) {
+    public AbuseLog(AbuseRequestDto req, String type) {
         createNewLog(req, type);
     }
     public AbuseLog() {
@@ -45,7 +45,7 @@ public class AbuseLog {
         return key;
     }
 
-    private static AbuseLog createNewLog(AbuseRequestDTO req, String t) {
+    private static AbuseLog createNewLog(AbuseRequestDto req, String t) {
         AbuseLog log = new AbuseLog();
         log.setType(t);
         log.setCount(1);

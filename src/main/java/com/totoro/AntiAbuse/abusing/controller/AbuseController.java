@@ -1,8 +1,9 @@
 package com.totoro.AntiAbuse.abusing.controller;
 
 import com.totoro.AntiAbuse.abusing.core.RateLimiter;
-import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDTO;
-import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
+import com.totoro.AntiAbuse.abusing.core.TotoroResponse;
+import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
+import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
 import com.totoro.AntiAbuse.abusing.service.AbuseService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +20,19 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 public class AbuseController {
-    private final AbuseService abuseService;
+    private final AbuseService<AbuseResponseDto> abuseService;
 
     private final RateLimiter commonRateLimiter;
 
 
     @PostMapping("/check-abuse")
-    public AbuseResponseDTO httpCheckAbuse(HttpServletRequest request) throws Exception {
-        AbuseResponseDTO responseDTO = abuseService.checkAbuse(request);
-        return responseDTO;
+    public TotoroResponse<AbuseResponseDto> httpCheckAbuse(HttpServletRequest request) throws Exception {
+        return abuseService.checkAbuse(request);
     }
 
-    @PostMapping("/check-abuse3")
-    public AbuseResponseDTO dtoCheckAbuse(AbuseRequestDTO requestDTO) throws Exception {
-        AbuseResponseDTO responseDTO = abuseService.checkAbuse(requestDTO);
-        return responseDTO;
+    @PostMapping("/check-abuse2")
+    public TotoroResponse<AbuseResponseDto> dtoCheckAbuse(AbuseRequestDto requestDTO) throws Exception {
+        return abuseService.checkAbuse(requestDTO);
     }
 
     @GetMapping("/test")

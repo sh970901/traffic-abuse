@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public class AbuseRequestDTO {
+public class AbuseRequestDto {
     private String pcId;
     private String fsId;
     private String domain;
@@ -18,7 +18,7 @@ public class AbuseRequestDTO {
     private String userAgent;
     private String remoteAddr;
 
-    public static AbuseRequestDTO of(HttpServletRequest request){
+    public static AbuseRequestDto of(HttpServletRequest request){
         String pcId = null;
         String fsId = null;
 
@@ -27,10 +27,10 @@ public class AbuseRequestDTO {
             pcId = CookieUtils.getCookieValue(cookies,"pcid");
             fsId = CookieUtils.getCookieValue(cookies,"fsid");
         }
-        return new AbuseRequestDTO(pcId, fsId, request.getRemoteAddr(), request.getRequestURI(), request.getHeader("User-Agent"), request.getServerName());
+        return new AbuseRequestDto(pcId, fsId, request.getRemoteAddr(), request.getRequestURI(), request.getHeader("User-Agent"), request.getServerName());
     }
 
-    private AbuseRequestDTO(String pcId, String fsId, String remoteAddr, String url, String userAgent, String domain) {
+    private AbuseRequestDto(String pcId, String fsId, String remoteAddr, String url, String userAgent, String domain) {
         this.pcId = pcId;
         this.fsId = fsId;
         this.remoteAddr = remoteAddr;

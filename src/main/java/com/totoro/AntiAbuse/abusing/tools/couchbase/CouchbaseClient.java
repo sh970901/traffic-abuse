@@ -56,9 +56,9 @@ public class CouchbaseClient {
         }
     }
 
-    public void addLog(AbuseLog l) {
-        String id = l.generateId();
-        JsonObject jsonObject = JsonObject.fromJson(l.toJson());
+    public void addLog(AbuseLog log) {
+        String id = log.generateId();
+        JsonObject jsonObject = JsonObject.fromJson(log.toJson());
         if (!existLog(id)) {
             logBucket.defaultCollection().insert(id, jsonObject);
         } else {

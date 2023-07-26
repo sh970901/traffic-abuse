@@ -1,7 +1,8 @@
 package com.totoro.AntiAbuse.demo;
 
 import com.totoro.AntiAbuse.abusing.core.RateLimiter;
-import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDTO;
+import com.totoro.AntiAbuse.abusing.core.TotoroResponse;
+import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +19,12 @@ public class DemoController {
         demoRepository.save(domain);
         return "ok";
     }
-    @GetMapping("/v1/test2")
-    public AbuseResponseDTO<String> test2(){
+    @GetMapping("/v1/healthy")
+    public TotoroResponse<AbuseResponseDto> test2(){
         RateLimiter rateLimiter = new RateLimiter();
         System.out.println(LocalDateTime.now());
-        //        LocalDateTime localDateTime = rateLimiter.truncateToMinutes(LocalDateTime.now());
-        //        System.out.println(localDateTime);
-        return AbuseResponseDTO.<String>from()
-                               .block(true)
-                               .data("dd")
+        return TotoroResponse.<AbuseResponseDto>from()
+                               .data(AbuseResponseDto.abuse(null, "healthy"))
                                .build();
     }
 }
