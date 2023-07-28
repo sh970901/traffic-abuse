@@ -5,11 +5,12 @@ import com.totoro.AntiAbuse.abusing.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Builder
 public class AbuseRequestDto {
     private String pcId;
     private String fsId;
@@ -17,6 +18,7 @@ public class AbuseRequestDto {
     private String url;
     private String userAgent;
     private String remoteAddr;
+    private String key;
 
     public static AbuseRequestDto of(HttpServletRequest request){
         String pcId = null;
@@ -40,10 +42,14 @@ public class AbuseRequestDto {
     }
 
     public String generateKey() {
+        if(this.key != null) return this.key;
+
         String key = this.remoteAddr + "::" + this.url;
         if (this.pcId != null && !this.pcId.isEmpty()) {
             key += "::" + this.pcId;
         }
+        this.key = key;
+
         return key;
     }
 

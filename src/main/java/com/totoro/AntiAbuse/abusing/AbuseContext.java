@@ -14,4 +14,5 @@ public class AbuseContext {
     public static final String IP_WRONG = "ipWrong";
     public static final String LIMITED = "limited";
     public static final String FIRST_VISIT = "firstVisit";
+    public static final String NON_FIRST_VISIT = "nonfirstVisit";
 }

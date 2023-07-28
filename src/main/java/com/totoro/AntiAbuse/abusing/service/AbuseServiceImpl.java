@@ -67,11 +67,15 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
                                     .build();
         }
 
-        handleFirstVisit(req, cbClient);
+        if (!isFirstVisit(req, cbClient)){
+            return TotoroResponse.<AbuseResponseDto>from()
+                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
+                                 .build();
+        }
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
         if(isNullPcId(req)){
-            AbuseLog log = new AbuseLog(req, "UNUSUAL_ID");
+            AbuseLog log = new AbuseLog(req, UNUSUAL_ID);
             cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
@@ -92,7 +96,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         } else {
             rateLimiter.incrementKey(key);
             return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"keyInc"))
+                                   .data(AbuseResponseDto.nonAbuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"KeyInc"))
                                    .build();
         }
     }
@@ -130,7 +134,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         return null;
     }
 
-    private void handleFirstVisit(AbuseRequestDto req, CouchbaseClient cbClient) {
+    private Boolean isFirstVisit(AbuseRequestDto req, CouchbaseClient cbClient) {
         if (req.getPcId() == null && req.getFsId() == null) {
             AbuseLog log = new AbuseLog(req, FIRST_VISIT);
 
@@ -138,14 +142,20 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
             if (cbClient.exist(log.generateId())) {
                 AbuseLog firstVisit = cbClient.getFirstVisit(log.generateId());
                 if (firstVisit != null && firstVisit.getCount() > firstVisitLimit) {
+                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
                     log.setCount(firstVisitLimit);
                     cbClient.addLog(log);
+                    return false;
                 } else {
                     cbClient.addFirstVisit(log);
+                    return true;
                 }
             } else {
                 cbClient.addFirstVisit(log);
+                return true;
+                //첫번째 방문에 pcId와 fsId가 둘 다 null 인 케이스
             }
         }
+        return true;
     }
 }
