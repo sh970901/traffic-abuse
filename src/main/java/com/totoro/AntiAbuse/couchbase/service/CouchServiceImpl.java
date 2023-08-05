@@ -1,22 +1,28 @@
 package com.totoro.AntiAbuse.couchbase.service;
 
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.kv.MutateInSpec;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
 import com.totoro.AntiAbuse.abusing.domain.LogDocument;
+import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import com.totoro.AntiAbuse.couchbase.repository.CouchRepository;
-import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CouchServiceImpl implements CouchService<LogDocument> {
     private final CouchRepository couchRepository;
 
-    @Override public void addData(LogDocument log) {
-        couchRepository.save(log);
+    @Override
+    public void addData(LogDocument log) {
+        LogDocument logDocument = couchRepository.findById(log.generateId()).orElse(null);
+        if( logDocument == null ){
+            couchRepository.save(log);
+        }
+        else {
+            logDocument.setCount(logDocument.getCount() + 1);
+            couchRepository.save(logDocument);
+        }
     }
     //    public void addLog(AbuseLog log) {
 //        String id = log.generateId();

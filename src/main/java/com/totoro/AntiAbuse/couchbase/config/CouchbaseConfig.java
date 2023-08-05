@@ -9,12 +9,12 @@ import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepos
 public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
     @Override
     public String getConnectionString() {
-        return "couchbase://10.250.25.16";
+        return "couchbase://127.0.0.1";
     }
 
     @Override
     public String getBucketName() {
-        return "abuse-log";
+        return "abuse_log";
     }
 
     @Override

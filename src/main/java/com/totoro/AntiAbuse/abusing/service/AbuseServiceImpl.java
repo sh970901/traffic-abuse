@@ -1,12 +1,11 @@
 package com.totoro.AntiAbuse.abusing.service;
 
 import com.totoro.AntiAbuse.abusing.domain.LogDocument;
+import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
-import com.totoro.AntiAbuse.couchbase.CouchbaseClient;
 import com.totoro.AntiAbuse.core.RateLimiter;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,18 +26,11 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
     private final RateLimiter commonRateLimiter;
     private final CouchService<LogDocument> couchbaseService;
-//    private final CouchbaseClient cbClient;
     private Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
-        couchbaseService.addData(LogDocument.builder()
-                            .id("1")
-                            .content("1")
-                            .date("1")
-                            .sender("1")
-                            .receiver("1")
-                            .build());
+//        couchbaseService.addData(LogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example")));
         return check(requestDTO);
     }
 
@@ -61,7 +53,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         }
 
         if(isBlackOrNullUser(req)){
-            AbuseLog log = new AbuseLog(req, req.getUserAgent());
+//            AbuseLog log = new AbuseLog(req, req.getUserAgent());
 //            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
@@ -69,7 +61,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         }
 
         if(!ipVaildCheck(req)){
-            AbuseLog log = new AbuseLog(req, IP_WRONG);
+//            AbuseLog log = new AbuseLog(req, IP_WRONG);
 //            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, IP_WRONG))
@@ -84,7 +76,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
         if(isNullPcId(req)){
-            AbuseLog log = new AbuseLog(req, UNUSUAL_ID);
+//            AbuseLog log = new AbuseLog(req, UNUSUAL_ID);
 //            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
@@ -96,7 +88,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         LimitStatus limitStatus = rateLimiter.check(key);
 
         if (limitStatus.isLimited()) {
-            AbuseLog log = new AbuseLog(req, "Limited");
+//            AbuseLog log = new AbuseLog(req, "Limited");
 //            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
@@ -143,28 +135,28 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         return null;
     }
 
-    private Boolean isFirstVisit(AbuseRequestDto req, CouchbaseClient cbClient) {
-        if (req.getPcId() == null && req.getFsId() == null) {
-            AbuseLog log = new AbuseLog(req, FIRST_VISIT);
-
-            int firstVisitLimit = 10;
-            if (cbClient.exist(log.generateId())) {
-                AbuseLog firstVisit = cbClient.getFirstVisit(log.generateId());
-                if (firstVisit != null && firstVisit.getCount() > firstVisitLimit) {
-                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
-                    log.setCount(firstVisitLimit);
-                    cbClient.addLog(log);
-                    return false;
-                } else {
-                    cbClient.addFirstVisit(log);
-                    return true;
-                }
-            } else {
-                cbClient.addFirstVisit(log);
-                return true;
-                //첫번째 방문에 pcId와 fsId가 둘 다 null 인 케이스
-            }
-        }
-        return true;
-    }
+//    private Boolean isFirstVisit(AbuseRequestDto req, CouchbaseClient cbClient) {
+//        if (req.getPcId() == null && req.getFsId() == null) {
+//            AbuseLog log = new AbuseLog(req, FIRST_VISIT);
+//
+//            int firstVisitLimit = 10;
+//            if (cbClient.exist(log.generateId())) {
+//                AbuseLog firstVisit = cbClient.getFirstVisit(log.generateId());
+//                if (firstVisit != null && firstVisit.getCount() > firstVisitLimit) {
+//                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
+//                    log.setCount(firstVisitLimit);
+//                    cbClient.addLog(log);
+//                    return false;
+//                } else {
+//                    cbClient.addFirstVisit(log);
+//                    return true;
+//                }
+//            } else {
+//                cbClient.addFirstVisit(log);
+//                return true;
+//                //첫번째 방문에 pcId와 fsId가 둘 다 null 인 케이스
+//            }
+//        }
+//        return true;
+//    }
 }
