@@ -1,8 +1,8 @@
-package com.totoro.AntiAbuse.abusing.core;
+package com.totoro.AntiAbuse.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.totoro.AntiAbuse.abusing.utils.TotoroToStringStyle;
+import com.totoro.AntiAbuse.utils.TotoroToStringStyle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

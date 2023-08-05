@@ -1,13 +1,10 @@
 package com.totoro.AntiAbuse.abusing.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.totoro.AntiAbuse.abusing.utils.CookieUtils;
+import com.totoro.AntiAbuse.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

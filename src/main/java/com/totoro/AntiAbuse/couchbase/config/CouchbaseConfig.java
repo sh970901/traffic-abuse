@@ -1,29 +1,29 @@
-package com.totoro.AntiAbuse.abusing.config;
+package com.totoro.AntiAbuse.couchbase.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
 import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepositories;
 
 @Configuration
-@EnableCouchbaseRepositories(basePackages={"com.totoro.AntiAbuse"})
+//@EnableCouchbaseRepositories(basePackages={"com.totoro.AntiAbuse"})
 public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
     @Override
     public String getConnectionString() {
-        return "couchbase://dev-couchbase.elandmall.co.kr";
+        return "couchbase://10.250.25.16";
     }
 
     @Override
     public String getBucketName() {
-        return "sample_bucket";
+        return "abuse-log";
     }
 
     @Override
     public String getUserName() {
-        return "dev_admin";
+        return "dev-admin";
     }
 
     @Override
     public String getPassword() {
-        return "dev_admin";
+        return "dev-admin";
     }
 }

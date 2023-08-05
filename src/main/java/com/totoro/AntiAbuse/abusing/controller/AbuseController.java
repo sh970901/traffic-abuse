@@ -1,7 +1,7 @@
 package com.totoro.AntiAbuse.abusing.controller;
 
-import com.totoro.AntiAbuse.abusing.core.RateLimiter;
-import com.totoro.AntiAbuse.abusing.core.TotoroResponse;
+import com.totoro.AntiAbuse.core.RateLimiter;
+import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
 import com.totoro.AntiAbuse.abusing.service.AbuseService;

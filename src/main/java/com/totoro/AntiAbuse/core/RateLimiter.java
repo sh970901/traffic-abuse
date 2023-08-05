@@ -1,7 +1,7 @@
-package com.totoro.AntiAbuse.abusing.core;
+package com.totoro.AntiAbuse.core;
 
-import com.totoro.AntiAbuse.abusing.tools.storage.AbuseLimitStore;
-import com.totoro.AntiAbuse.abusing.tools.storage.LimitStatus;
+import com.totoro.AntiAbuse.tools.storage.AbuseLimitStore;
+import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 

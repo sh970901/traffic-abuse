@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing.tools.couchbase;
+package com.totoro.AntiAbuse.couchbase;
 
 
 import com.couchbase.client.java.Bucket;
@@ -7,17 +7,17 @@ import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutateInSpec;
-import com.totoro.AntiAbuse.abusing.tools.storage.AbuseLimit;
+import com.totoro.AntiAbuse.tools.storage.AbuseLimit;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
-import com.totoro.AntiAbuse.abusing.tools.storage.AbuseRule;
-import com.totoro.AntiAbuse.abusing.tools.storage.Blacklist;
+import com.totoro.AntiAbuse.tools.storage.AbuseRule;
+import com.totoro.AntiAbuse.tools.storage.Blacklist;
 import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 
-@Component
+//@Component
 public class CouchbaseClient {
 
     private Cluster cluster;

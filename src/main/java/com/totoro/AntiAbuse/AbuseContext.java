@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing;
+package com.totoro.AntiAbuse;
 
 public class AbuseContext {
     public static final String CB_CONN_STR_DEV = "";

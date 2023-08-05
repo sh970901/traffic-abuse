@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing.tools.storage;
+package com.totoro.AntiAbuse.tools.storage;
 
 import java.time.LocalDateTime;
 

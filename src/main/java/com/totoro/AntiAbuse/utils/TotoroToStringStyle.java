@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing.utils;
+package com.totoro.AntiAbuse.utils;
 
 import org.apache.commons.lang3.builder.ToStringStyle;
 

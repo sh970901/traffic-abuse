@@ -1,12 +1,13 @@
 package com.totoro.AntiAbuse.abusing.service;
 
-import com.totoro.AntiAbuse.abusing.AbuseContext;
-import com.totoro.AntiAbuse.abusing.core.TotoroResponse;
+import com.totoro.AntiAbuse.abusing.domain.LogDocument;
+import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
-import com.totoro.AntiAbuse.abusing.tools.storage.LimitStatus;
+import com.totoro.AntiAbuse.couchbase.service.CouchService;
+import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLog;
-import com.totoro.AntiAbuse.abusing.tools.couchbase.CouchbaseClient;
-import com.totoro.AntiAbuse.abusing.core.RateLimiter;
+import com.totoro.AntiAbuse.couchbase.CouchbaseClient;
+import com.totoro.AntiAbuse.core.RateLimiter;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.totoro.AntiAbuse.abusing.AbuseContext.*;
-import static com.totoro.AntiAbuse.abusing.utils.RequestUtils.*;
+import static com.totoro.AntiAbuse.AbuseContext.*;
+import static com.totoro.AntiAbuse.utils.RequestUtils.*;
 
 // https://www.mimul.com/blog/about-rate-limit-algorithm/
 // Sliding Window Counter 수식 참고
@@ -25,11 +26,19 @@ import static com.totoro.AntiAbuse.abusing.utils.RequestUtils.*;
 public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
     private final RateLimiter commonRateLimiter;
-    private final CouchbaseClient cbClient;
+    private final CouchService<LogDocument> couchbaseService;
+//    private final CouchbaseClient cbClient;
     private Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
+        couchbaseService.addData(LogDocument.builder()
+                            .id("1")
+                            .content("1")
+                            .date("1")
+                            .sender("1")
+                            .receiver("1")
+                            .build());
         return check(requestDTO);
     }
 
@@ -53,7 +62,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         if(isBlackOrNullUser(req)){
             AbuseLog log = new AbuseLog(req, req.getUserAgent());
-            cbClient.addLog(log);
+//            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
                                     .build();
@@ -61,22 +70,22 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         if(!ipVaildCheck(req)){
             AbuseLog log = new AbuseLog(req, IP_WRONG);
-            cbClient.addLog(log);
+//            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, IP_WRONG))
                                     .build();
         }
 
-        if (!isFirstVisit(req, cbClient)){
-            return TotoroResponse.<AbuseResponseDto>from()
-                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
-                                 .build();
-        }
+//        if (!isFirstVisit(req, cbClient)){
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
+//                                 .build();
+//        }
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
         if(isNullPcId(req)){
             AbuseLog log = new AbuseLog(req, UNUSUAL_ID);
-            cbClient.addLog(log);
+//            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
                                    .build();
@@ -88,7 +97,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         if (limitStatus.isLimited()) {
             AbuseLog log = new AbuseLog(req, "Limited");
-            cbClient.addLog(log);
+//            cbClient.addLog(log);
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
                                    .build();

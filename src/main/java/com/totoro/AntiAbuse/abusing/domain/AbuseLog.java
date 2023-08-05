@@ -65,6 +65,7 @@ public class AbuseLog {
 
     private static AbuseLog createNewLog(AbuseRequestDto req, String type) {
         AbuseLog log = new AbuseLog();
+        log.setId(1L);
         log.setType(type);
         log.setCount(1);
         log.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
