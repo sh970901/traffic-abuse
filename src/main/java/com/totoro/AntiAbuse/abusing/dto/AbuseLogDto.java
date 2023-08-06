@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.couchbase.client.core.deps.com.google.gson.JsonObject;
-import com.totoro.AntiAbuse.abusing.domain.LogDocument;
+import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import lombok.*;
 
 @Builder
@@ -58,7 +58,7 @@ public class AbuseLogDto {
         return String.valueOf(new JsonObject());
     }
 
-    public AbuseLogDto convertDocumentToDto(LogDocument logDocument){
+    public AbuseLogDto convertDocumentToDto(AbuseLogDocument logDocument){
         return AbuseLogDto.builder()
                 .type(logDocument.getType())
                 .count(logDocument.getCount())
