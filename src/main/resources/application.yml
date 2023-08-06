@@ -24,4 +24,8 @@ couchbase:
     name: abuse
     user-name: dev-admin
     password: dev-admin
+  bucket-abuse-limit:
+    name: abuse_limit
+    user-name: dev-admin
+    password: dev-admin
 

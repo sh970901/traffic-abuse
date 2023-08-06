@@ -1,6 +1,7 @@
 package com.totoro.AntiAbuse.couchbase.config;
 
 import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
+import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -44,7 +45,8 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
         try {
             baseMapping
                     .mapEntity(AbuseLogDocument.class, logTemplate())
-                    .mapEntity(AbuseDocument.class, abuseTemplate());
+                    .mapEntity(AbuseDocument.class, abuseTemplate())
+                    .mapEntity(AbuseLimitDocument.class, limitTemplate());
         } catch (Exception e) {
             throw e;
         }
@@ -69,6 +71,16 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
     @Bean("abuseTemplate")
     public CouchbaseTemplate abuseTemplate(){
         return new CouchbaseTemplate(abuseClientFactory(), new MappingCouchbaseConverter());
+    }
+
+    @Bean("limitClientFactory")
+    public CouchbaseClientFactory limitClientFactory(){
+        return new SimpleCouchbaseClientFactory(getConnectionString(),authenticator(), couchClusterProperties.getBucketAbuseLimit().getName());
+    }
+
+    @Bean("limitTemplate")
+    public CouchbaseTemplate limitTemplate(){
+        return new CouchbaseTemplate(limitClientFactory(), new MappingCouchbaseConverter());
     }
 
 }

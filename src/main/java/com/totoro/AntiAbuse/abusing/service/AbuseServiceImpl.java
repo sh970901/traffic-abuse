@@ -1,6 +1,7 @@
 package com.totoro.AntiAbuse.abusing.service;
 
 import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
+import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import com.totoro.AntiAbuse.core.TotoroResponse;
@@ -28,12 +29,14 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     private final RateLimiter commonRateLimiter;
     private final CouchService<AbuseLogDocument> abuseLogService;
     private final CouchService<AbuseDocument> abuseService;
+    private final CouchService<AbuseLimitDocument> abuseLimitService;
     private Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
         abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example")));
         abuseService.addData(AbuseDocument.builder().type("h1").type2("h2").build());
+        abuseLimitService.addData(AbuseLimitDocument.builder().type("h1").type("h2").build());
         return check(requestDTO);
     }
 

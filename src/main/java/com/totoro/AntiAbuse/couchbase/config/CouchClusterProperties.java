@@ -20,4 +20,7 @@ public class CouchClusterProperties {
 
     @NestedConfigurationProperty
     private CouchBucketProperties bucketAbuse;
+
+    @NestedConfigurationProperty
+    private CouchBucketProperties bucketAbuseLimit;
 }
