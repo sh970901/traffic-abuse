@@ -70,7 +70,6 @@ public class AbuseLogDto {
                 .url(logDocument.getUrl())
                 .userAgent(logDocument.getUserAgent())
                 .domain(logDocument.getDomain())
-                .key(logDocument.getKey())
                 .build();
     }
 }

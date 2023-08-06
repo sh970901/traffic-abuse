@@ -12,6 +12,7 @@ spring:
   jpa:
     open-in-view: false
 
+
 couchbase:
   connection-string: couchbase://127.0.0.1
   username: dev-admin
@@ -29,3 +30,6 @@ couchbase:
     user-name: dev-admin
     password: dev-admin
 
+logging:
+  level:
+    org.springframework.data: INFO

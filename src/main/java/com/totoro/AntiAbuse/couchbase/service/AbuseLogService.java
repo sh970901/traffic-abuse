@@ -11,14 +11,18 @@ public class AbuseLogService implements CouchService<AbuseLogDocument> {
     private final AbuseLogRepository logRepository;
     @Override
     public void addData(AbuseLogDocument log) {
-        AbuseLogDocument logDocument = logRepository.findById(log.generateId()).orElse(null);
-        if( logDocument == null ){
-            logRepository.save(log);
+        String id = log.generateId();
+        AbuseLogDocument existingLog = logRepository.findById(id).orElse(null);
+
+        if (existingLog == null) {
+            // Document doesn't exist, create a new one with count = 1
+            log.setCount(1);
+        } else {
+            // Document exists, increment the count value by 1
+            log.setCount(existingLog.getCount() + 1);
         }
-        else {
-            logDocument.setCount(logDocument.getCount() + 1);
-            logRepository.save(logDocument);
-        }
+
+        logRepository.save(log);
     }
 //        public void addLog(AbuseLog log) {
 //        String id = log.generateId();

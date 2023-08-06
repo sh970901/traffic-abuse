@@ -8,58 +8,73 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
+import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
+import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
+import org.springframework.data.couchbase.core.mapping.id.IdAttribute;
+
+import java.io.Serializable;
 
 @Builder
 @Data
 @AllArgsConstructor
 @Document
-public class AbuseLogDocument {
+public class AbuseLogDocument implements Serializable {
+    private static final long serialVersionUID = 7330101127517450930L;
+
     @Id
-//    @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
+    @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES, delimiter = "#")
     private String id;
 
     @Field
+    @CreatedDate
+    @IdAttribute(order=0)
+    private String date;
+
+    @Field
+    @IdAttribute(order=1)
     private String type;
+
     @Field
     private long count;
+
     @Field
-    @CreatedDate
-    private String date;
-    @Field
+    @IdAttribute(order=1)
     private String mbId;
+
     @Field
+    @IdAttribute(order=4)
+
     private String pcId;
+
     @Field
     private String fsId;
+
     @Field
+    @IdAttribute(order=2)
     private String remoteAddr;
+
     @Field
+    @IdAttribute(order=3)
     private String url;
+
     @Field
     private String userAgent;
+
     @Field
     private String domain;
 
-    private String key;
 
     public String generateId() {
-        if(this.key != null) {
-            return key;
-        }
-        String key = date + "::" + type + "::" + remoteAddr + "::" + url;
+        String key = date + "#" + type + "#" + remoteAddr + "#" + url;
         if (pcId != null && !pcId.isEmpty()) {
             key += "::" + pcId;
         }
-        this.key = key;
-
         return key;
     }
 
     public static AbuseLogDocument convertDtoToDocument(AbuseLogDto logDto){
         return AbuseLogDocument.builder()
-                .id(logDto.generateId())
                 .type(logDto.getType())
-                .count(logDto.getCount())
                 .date(logDto.getDate())
                 .mbId(logDto.getMbId())
                 .pcId(logDto.getPcId())
@@ -68,7 +83,6 @@ public class AbuseLogDocument {
                 .url(logDto.getUrl())
                 .userAgent(logDto.getUserAgent())
                 .domain(logDto.getDomain())
-                .key(logDto.getKey())
                 .build();
     }
 }

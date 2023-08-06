@@ -34,7 +34,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
-        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example")));
+        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
         abuseService.addData(AbuseDocument.builder().type("h1").type2("h2").build());
         abuseLimitService.addData(AbuseLimitDocument.builder().type("h1").type("h2").build());
         return check(requestDTO);
