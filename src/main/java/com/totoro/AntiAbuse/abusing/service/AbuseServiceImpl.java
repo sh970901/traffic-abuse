@@ -4,12 +4,14 @@ import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
-import com.totoro.AntiAbuse.core.TotoroResponse;
-import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
-import com.totoro.AntiAbuse.couchbase.service.CouchService;
-import com.totoro.AntiAbuse.tools.storage.LimitStatus;
-import com.totoro.AntiAbuse.core.RateLimiter;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
+import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
+import com.totoro.AntiAbuse.core.RateLimiter;
+import com.totoro.AntiAbuse.core.TotoroResponse;
+import com.totoro.AntiAbuse.couchbase.service.CouchService;
+import com.totoro.AntiAbuse.tools.storage.Blacklist;
+import com.totoro.AntiAbuse.tools.storage.LimitStatus;
+import com.totoro.AntiAbuse.tools.storage.Rule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,8 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
 //        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
-//        abuseService.addData(AbuseDocument.builder().type("h1").type2("h2").build());
-//        abuseLimitService.addData(AbuseLimitDocument.builder().type("h1").type("h2").build());
+//        abuseService.addData(AbuseDocument.builder().type("rule").rule(new Rule()).build());
+//        abuseLimitService.addData(AbuseLimitDocument.builder().url("/").build());
         return check(requestDTO);
     }
 

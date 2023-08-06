@@ -3,6 +3,7 @@ package com.totoro.AntiAbuse.tools.storage;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -17,5 +18,9 @@ public class Blacklist {
 
     public String toJson() {
         return "gg";
+    }
+    public Blacklist(){
+        this.ipAddress = new ArrayList<>();
+        this.memberIds = new ArrayList<>();
     }
 }

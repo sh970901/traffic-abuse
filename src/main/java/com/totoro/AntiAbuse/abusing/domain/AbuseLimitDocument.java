@@ -1,8 +1,11 @@
 package com.totoro.AntiAbuse.abusing.domain;
 
+import com.totoro.AntiAbuse.tools.storage.AbuseLimit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
@@ -15,6 +18,7 @@ import java.io.Serializable;
 @Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Document
 public class AbuseLimitDocument implements Serializable {
     private static final long serialVersionUID = 7330101127517450935L;
@@ -25,9 +29,22 @@ public class AbuseLimitDocument implements Serializable {
 
     @Field
     @IdAttribute(order=0)
-    private String type;
+    private String remoteAddr;
 
     @Field
     @IdAttribute(order=1)
-    private String type2;
+    private String url;
+
+    @Field
+    @IdAttribute(order=2)
+    private String pcId;
+
+    @Field
+    @CreatedDate
+    @IdAttribute(order=3)
+    private String date;
+
+    @Field
+    private AbuseLimit limit;
+
 }

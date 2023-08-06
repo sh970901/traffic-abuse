@@ -3,7 +3,6 @@ package com.totoro.AntiAbuse.couchbase.repository;
 
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import org.springframework.data.couchbase.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 

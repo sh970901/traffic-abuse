@@ -1,7 +1,7 @@
 package com.totoro.AntiAbuse.abusing.service;
 
-import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
+import com.totoro.AntiAbuse.core.TotoroResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface AbuseService<T> {

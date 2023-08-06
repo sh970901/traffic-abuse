@@ -1,5 +1,7 @@
 package com.totoro.AntiAbuse.abusing.domain;
 
+import com.totoro.AntiAbuse.tools.storage.Rule;
+import com.totoro.AntiAbuse.tools.storage.Blacklist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +22,7 @@ public class AbuseDocument implements Serializable {
     private static final long serialVersionUID = 7330101427517450936L;
 
     @Id
-    @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES, delimiter = "#")
+    @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES)
     private String id;
 
     @Field
@@ -28,7 +30,9 @@ public class AbuseDocument implements Serializable {
     private String type;
 
     @Field
-    @IdAttribute(order=1)
-    private String type2;
+    private Rule rule;
+
+    @Field
+    private Blacklist blacklist;
 
 }

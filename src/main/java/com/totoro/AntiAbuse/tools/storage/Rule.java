@@ -1,14 +1,14 @@
 package com.totoro.AntiAbuse.tools.storage;
 
-import com.couchbase.client.core.deps.com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-public class AbuseRule {
+public class Rule {
     private long requestsLimit;
     private long firstVisitLimit;
     private List<AbuseDomain> domains;
@@ -17,13 +17,16 @@ public class AbuseRule {
     private List<String> whiteUserAgent;
     private List<String> blackUserAgent;
 
-
-    public static AbuseRule fromJson(String toString) {
-        return new AbuseRule();
+    public Rule(){
+        this.domains = new ArrayList<>();
+        this.keywords = new ArrayList<>();
+        this.notKeywords = new ArrayList<>();
+        this.whiteUserAgent = new ArrayList<>();
+        this.blackUserAgent = new ArrayList<>();
     }
 
-    public String  toJson() {
-        Gson gson = new Gson();
-        return "gg";
+    public static Rule fromJson(String toString) {
+        return new Rule();
     }
+
 }

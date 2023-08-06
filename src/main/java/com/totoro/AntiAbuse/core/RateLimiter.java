@@ -33,13 +33,14 @@ public class RateLimiter {
 
     // ToDo: Exception 처리
 
-    public LimitStatus check(String message) throws Exception {
+    public LimitStatus check(String key) throws Exception {
         LocalDateTime currentWindowStartTime = truncateToMinutes(LocalDateTime.now()); // 현재 윈도우 시작 시간
         LocalDateTime prevWindowStartTime = currentWindowStartTime.minus(windowSize); //이전 윈도우 시작 시간
 
+        //1분에 하나씩 limitDocument를 생성하고 count를 증가하는 방식
         long prevRequests, currentRequests;
         try {
-            long[] requests = dataStore.get(message, prevWindowStartTime, currentWindowStartTime);
+            long[] requests = dataStore.get(key, prevWindowStartTime, currentWindowStartTime);
             prevRequests = requests[0];
             currentRequests = requests[1];
         } catch (Exception e) {

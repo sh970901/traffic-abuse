@@ -1,6 +1,5 @@
 package com.totoro.AntiAbuse.couchbase.config;
 
-import com.couchbase.client.java.query.QueryScanConsistency;
 import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
