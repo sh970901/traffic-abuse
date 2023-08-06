@@ -14,4 +14,14 @@ public class AbuseService implements CouchService<AbuseDocument> {
     public void addData(AbuseDocument abuse) {
         abuseRepository.save(abuse);
     }
+
+    @Override
+    public AbuseDocument getData(String id) {
+        return null;
+    }
+
+    @Override
+    public AbuseDocument saveForce(AbuseDocument data) {
+        return null;
+    }
 }

@@ -5,6 +5,8 @@ import com.totoro.AntiAbuse.couchbase.repository.AbuseLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AbuseLogService implements CouchService<AbuseLogDocument> {
@@ -23,6 +25,14 @@ public class AbuseLogService implements CouchService<AbuseLogDocument> {
         }
 
         logRepository.save(log);
+    }
+
+    public AbuseLogDocument getData(String id){
+        return logRepository.findById(id).orElse(null);
+    }
+
+    public AbuseLogDocument saveForce(AbuseLogDocument logDocument){
+        return logRepository.save(logDocument);
     }
 //        public void addLog(AbuseLog log) {
 //        String id = log.generateId();

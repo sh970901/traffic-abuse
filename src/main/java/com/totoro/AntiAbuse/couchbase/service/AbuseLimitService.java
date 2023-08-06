@@ -15,6 +15,16 @@ public class AbuseLimitService implements CouchService<AbuseLimitDocument> {
     public void addData(AbuseLimitDocument limit) {
         limitRepository.save(limit);
     }
+
+    @Override
+    public AbuseLimitDocument getData(String id) {
+        return null;
+    }
+
+    @Override
+    public AbuseLimitDocument saveForce(AbuseLimitDocument data) {
+        return null;
+    }
 //        public void addLog(AbuseLog log) {
 //        String id = log.generateId();
 //        JsonObject jsonObject = JsonObject.fromJson(log.toJson());

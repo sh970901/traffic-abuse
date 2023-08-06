@@ -34,9 +34,9 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
-        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
-        abuseService.addData(AbuseDocument.builder().type("h1").type2("h2").build());
-        abuseLimitService.addData(AbuseLimitDocument.builder().type("h1").type("h2").build());
+//        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
+//        abuseService.addData(AbuseDocument.builder().type("h1").type2("h2").build());
+//        abuseLimitService.addData(AbuseLimitDocument.builder().type("h1").type("h2").build());
         return check(requestDTO);
     }
 
@@ -59,31 +59,31 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         }
 
         if(isBlackOrNullUser(req)){
-//            AbuseLog log = new AbuseLog(req, req.getUserAgent());
-//            cbClient.addLog(log);
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
                                     .build();
         }
 
         if(!ipVaildCheck(req)){
-//            AbuseLog log = new AbuseLog(req, IP_WRONG);
-//            cbClient.addLog(log);
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, IP_WRONG))
                                     .build();
         }
 
-//        if (!isFirstVisit(req, cbClient)){
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
-//                                 .build();
-//        }
+        if (!isFirstVisit(req)){
+            return TotoroResponse.<AbuseResponseDto>from()
+                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
+                                 .build();
+        }
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
         if(isNullPcId(req)){
-//            AbuseLog log = new AbuseLog(req, UNUSUAL_ID);
-//            cbClient.addLog(log);
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
                                    .build();
@@ -94,8 +94,8 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         LimitStatus limitStatus = rateLimiter.check(key);
 
         if (limitStatus.isLimited()) {
-//            AbuseLog log = new AbuseLog(req, "Limited");
-//            cbClient.addLog(log);
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, "Limited");
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                                    .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
                                    .build();
@@ -141,28 +141,28 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         return null;
     }
 
-//    private Boolean isFirstVisit(AbuseRequestDto req, CouchbaseClient cbClient) {
-//        if (req.getPcId() == null && req.getFsId() == null) {
-//            AbuseLog log = new AbuseLog(req, FIRST_VISIT);
-//
-//            int firstVisitLimit = 10;
-//            if (cbClient.exist(log.generateId())) {
-//                AbuseLog firstVisit = cbClient.getFirstVisit(log.generateId());
-//                if (firstVisit != null && firstVisit.getCount() > firstVisitLimit) {
-//                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
-//                    log.setCount(firstVisitLimit);
-//                    cbClient.addLog(log);
-//                    return false;
-//                } else {
-//                    cbClient.addFirstVisit(log);
-//                    return true;
-//                }
-//            } else {
-//                cbClient.addFirstVisit(log);
-//                return true;
-//                //첫번째 방문에 pcId와 fsId가 둘 다 null 인 케이스
-//            }
-//        }
-//        return true;
-//    }
+    private Boolean isFirstVisit(AbuseRequestDto req) {
+        if (req.getPcId() == null && req.getFsId() == null) {
+            AbuseLogDto logDto = AbuseLogDto.createNewLog(req, FIRST_VISIT);
+
+            int firstVisitLimit = 10;
+            AbuseLogDocument logDocument = abuseLogService.getData(logDto.generateId());
+            if (logDocument != null) {
+                if (logDocument.getCount() > firstVisitLimit) {
+                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
+                    logDto.setCount(firstVisitLimit);
+                    abuseLogService.saveForce(AbuseLogDocument.convertDtoToDocument(logDto));
+                    return false;
+                } else {
+                    abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(logDto));
+                    return true;
+                }
+            } else {
+                abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(logDto));
+                return true;
+                //첫번째 방문에 pcId와 fsId가 둘 다 null 인 케이스
+            }
+        }
+        return true;
+    }
 }
