@@ -10,12 +10,14 @@ import com.totoro.AntiAbuse.core.RateLimiter;
 import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
+import com.totoro.AntiAbuse.tools.storage.Limit;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import com.totoro.AntiAbuse.tools.storage.Rule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +40,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
 //        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
 //        abuseService.addData(AbuseDocument.builder().type("rule").rule(new Rule()).build());
-//        abuseLimitService.addData(AbuseLimitDocument.builder().url("/").build());
+        abuseLimitService.addData(AbuseLimitDocument.builder().url("/g222").limit(new Limit()).build());
         return check(requestDTO);
     }
 

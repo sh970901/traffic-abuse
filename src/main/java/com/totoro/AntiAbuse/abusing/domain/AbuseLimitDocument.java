@@ -1,6 +1,6 @@
 package com.totoro.AntiAbuse.abusing.domain;
 
-import com.totoro.AntiAbuse.tools.storage.AbuseLimit;
+import com.totoro.AntiAbuse.tools.storage.Limit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,6 +45,6 @@ public class AbuseLimitDocument implements Serializable {
     private String date;
 
     @Field
-    private AbuseLimit limit;
+    private Limit limit;
 
 }
