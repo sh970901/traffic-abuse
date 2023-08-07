@@ -41,6 +41,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 //        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
 //        abuseService.addData(AbuseDocument.builder().type("rule").rule(new Rule()).build());
         abuseLimitService.addData(AbuseLimitDocument.builder().url("/g222").limit(new Limit()).build());
+        //Limit 객체의 Inc 함수를 abuseLimitService 사용하도록 로직을 변경해야함
         return check(requestDTO);
     }
 
