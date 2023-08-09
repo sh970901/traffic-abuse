@@ -24,27 +24,40 @@ public class AbuseLimitDocument implements Serializable {
     private static final long serialVersionUID = 7330101127517450935L;
 
     @Id
-    @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES, delimiter = "#")
+//    @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES, delimiter = "#")
     private String id;
 
-    @Field
-    @IdAttribute(order=0)
-    private String remoteAddr;
+////    @Field
+////    @IdAttribute(order=0)
+//    private String remoteAddr;
+//
+////    @Field
+////    @IdAttribute(order=1)
+//    private String url;
+//
+////    @Field
+////    @IdAttribute(order=2)
+//    private String pcId;
+//
+////    @Field
+////    @CreatedDate
+////    @IdAttribute(order=3)
+//    private String date;
 
     @Field
-    @IdAttribute(order=1)
-    private String url;
+    private long count;
 
-    @Field
-    @IdAttribute(order=2)
-    private String pcId;
+    public AbuseLimitDocument(String remoteAddr, String url, String pcId, String date, long count){
+        this.id = remoteAddr + "#" + url + "#" + pcId + "#" + date;
+        this.count = count;
+    }
+    public AbuseLimitDocument(String id){
+        this.id = id;
+        this.count = 0;
+    }
 
-    @Field
-    @CreatedDate
-    @IdAttribute(order=3)
-    private String date;
-
-    @Field
-    private Limit limit;
+//    public String generateId() {
+//        return remoteAddr + "#" + url + "#" + pcId + "#" + date;
+//    }
 
 }

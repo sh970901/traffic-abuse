@@ -1,5 +1,7 @@
 package com.totoro.AntiAbuse.core;
 
+import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
+import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.AbuseLimitStore;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import lombok.Getter;
@@ -17,18 +19,24 @@ public class RateLimiter {
     private Duration windowSize;
     private Map<String, Integer> urls;
 
-    public RateLimiter(AbuseLimitStore dataStore, int requestsLimit, Map<String, Integer> urls) {
+    private CouchService<AbuseLimitDocument> abuseLimitService;
+
+
+    public RateLimiter(AbuseLimitStore dataStore, int requestsLimit, Map<String, Integer> urls,CouchService<AbuseLimitDocument> abuseLimitService) {
         this.dataStore = dataStore;
         this.requestsLimit = requestsLimit;
         this.windowSize = Duration.ofMinutes(1); // 1분 단위로 윈도우 크기 설정
         this.urls = urls;
+        this.abuseLimitService = abuseLimitService;
     }
     public RateLimiter(){
 
     }
-    public void incrementKey(String message) throws Exception {
+    public void incrementKey(String key) throws Exception {
         LocalDateTime currentWindow = truncateToMinutes(LocalDateTime.now());
-        dataStore.incrementKey(message, currentWindow);
+//        dataStore.incrementKey(key, currentWindow);
+        abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
+
     }
 
     // ToDo: Exception 처리
