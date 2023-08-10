@@ -36,7 +36,6 @@ public class RateLimiter {
         LocalDateTime currentWindow = truncateToMinutes(LocalDateTime.now());
 //        dataStore.incrementKey(key, currentWindow);
         abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
-
     }
 
     // ToDo: Exception 처리

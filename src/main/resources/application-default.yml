@@ -10,5 +10,5 @@ spring:
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:/test;
-    username: sa
+    username: ENC(xRtMn3P0c0YyNS0gvZ0nBA==)
     password:

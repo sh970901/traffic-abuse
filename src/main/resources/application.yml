@@ -12,11 +12,15 @@ spring:
   jpa:
     open-in-view: false
 
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
 
 couchbase:
-  connection-string: couchbase://10.250.25.16
-  username: dev-admin
-  password: dev-admin
+  connection-string: ENC(Il6lCfMZJx6CUSrTRUeihEb5aJzuD5vno21sisl8f3FQHhVXWZwjBg==)
+#  connection-string: ENC(Qp9iMFzXOstAUc2b9KNItwxUloO85ciyymNXt9Sxvx0=)
+  username: ENC(nBzV1KeBwgKxwGiUxaVX/mlNcV69mtP1)
+  password: ENC(OVGKDlSCauyWNaLjs/+iA7uV2vxFFzDs)
   bucket-abuse-log:
     name: abuse-log
     user-name: dev-admin

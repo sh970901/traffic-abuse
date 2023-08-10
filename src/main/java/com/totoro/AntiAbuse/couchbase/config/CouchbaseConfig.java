@@ -4,6 +4,7 @@ import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import lombok.RequiredArgsConstructor;
+import org.jasypt.encryption.StringEncryptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,6 +20,7 @@ import org.springframework.data.couchbase.repository.config.RepositoryOperations
 //@EnableCouchbaseRepositories(basePackages={"com.totoro.AntiAbuse"})
 public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
     private final CouchClusterProperties couchClusterProperties;
+    private final StringEncryptor jasyptStringEncryptor;
 
     @Override
     public String getConnectionString() {
@@ -82,5 +84,6 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
     public CouchbaseTemplate limitTemplate(){
         return new CouchbaseTemplate(limitClientFactory(), new MappingCouchbaseConverter());
     }
+
 
 }
