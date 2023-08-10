@@ -6,8 +6,6 @@ spring:
       - default
       - local
       - dev
-      - integration
-      - stg
       - prod
   jpa:
     open-in-view: false

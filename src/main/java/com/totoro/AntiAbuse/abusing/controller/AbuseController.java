@@ -38,9 +38,6 @@ public class AbuseController {
     @GetMapping("/test")
     public String test(){
         RateLimiter rateLimiter = new RateLimiter();
-        System.out.println(LocalDateTime.now());
-//        LocalDateTime localDateTime = rateLimiter.truncateToMinutes(LocalDateTime.now());
-//        System.out.println(localDateTime);
         return "ok";
     }
 

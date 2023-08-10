@@ -56,43 +56,44 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         RateLimiter rateLimiter = findRateLimiter(req);
         if(rateLimiter == null) rateLimiter = commonRateLimiter;
 
+//        rateLimiter.incrementKey(req.generateKey());
 
-        if (isWhiteUserAgent(req.getUserAgent())) {
-            return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
-                                   .build();
-        }
+//        if (isWhiteUserAgent(req.getUserAgent())) {
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
+//                                   .build();
+//        }
+//
+//        if(isBlackOrNullUser(req)){
+//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
+//            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                    .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
+//                                    .build();
+//        }
+//
+//        if(!ipValidCheck(req)){
+//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
+//            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                    .data(AbuseResponseDto.abuse(null, IP_WRONG))
+//                                    .build();
+//        }
 
-        if(isBlackOrNullUser(req)){
-            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-            return TotoroResponse.<AbuseResponseDto>from()
-                                    .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
-                                    .build();
-        }
-
-        if(!ipVaildCheck(req)){
-            AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-            return TotoroResponse.<AbuseResponseDto>from()
-                                    .data(AbuseResponseDto.abuse(null, IP_WRONG))
-                                    .build();
-        }
-
-        if (!isFirstVisit(req)){
-            return TotoroResponse.<AbuseResponseDto>from()
-                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
-                                 .build();
-        }
+//        if (!isFirstVisit(req)){
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
+//                                 .build();
+//        }
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
-        if(isNullPcId(req)){
-            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-            return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
-                                   .build();
-        }
+//        if(isNullPcId(req)){
+//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
+//            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                   .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
+//                                   .build();
+//        }
 
 
         String key = req.generateKey();
@@ -108,12 +109,12 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         } else {
             rateLimiter.incrementKey(key);
             return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"KeyInc"))
+                                   .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc"))
                                    .build();
         }
     }
 
-    private boolean ipVaildCheck(AbuseRequestDto req) {
+    private boolean ipValidCheck(AbuseRequestDto req) {
         String fsId = req.getFsId();
         if (req.getPcId() != null && fsId != null && fsId.length() == 20) {
             String ipAddress = fsId.substring(6, 14);
@@ -156,6 +157,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
                 if (logDocument.getCount() > firstVisitLimit) {
                     //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
                     logDto.setCount(firstVisitLimit);
+                    // count 초기화 한 값을 다시 저장해야하나?
                     abuseLogService.saveForce(AbuseLogDocument.convertDtoToDocument(logDto));
                     return false;
                 } else {
@@ -170,4 +172,5 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         }
         return true;
     }
+
 }

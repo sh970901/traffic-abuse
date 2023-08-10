@@ -5,6 +5,7 @@ import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.AbuseLimitStore;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -14,27 +15,15 @@ import java.util.Map;
 @Component
 @Getter
 public class RateLimiter {
-    private AbuseLimitStore dataStore;
     private int requestsLimit;
-    private Duration windowSize;
+    private final Duration windowSize = Duration.ofMinutes(1);
     private Map<String, Integer> urls;
 
+    @Autowired
     private CouchService<AbuseLimitDocument> abuseLimitService;
 
-
-    public RateLimiter(AbuseLimitStore dataStore, int requestsLimit, Map<String, Integer> urls,CouchService<AbuseLimitDocument> abuseLimitService) {
-        this.dataStore = dataStore;
-        this.requestsLimit = requestsLimit;
-        this.windowSize = Duration.ofMinutes(1); // 1분 단위로 윈도우 크기 설정
-        this.urls = urls;
-        this.abuseLimitService = abuseLimitService;
-    }
-    public RateLimiter(){
-
-    }
     public void incrementKey(String key) throws Exception {
         LocalDateTime currentWindow = truncateToMinutes(LocalDateTime.now());
-//        dataStore.incrementKey(key, currentWindow);
         abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
     }
 
@@ -43,22 +32,30 @@ public class RateLimiter {
     public LimitStatus check(String key) throws Exception {
         LocalDateTime currentWindowStartTime = truncateToMinutes(LocalDateTime.now()); // 현재 윈도우 시작 시간
         LocalDateTime prevWindowStartTime = currentWindowStartTime.minus(windowSize); //이전 윈도우 시작 시간
+        LimitStatus limitStatus;
 
         //1분에 하나씩 limitDocument를 생성하고 count를 증가하는 방식
         long prevRequests, currentRequests;
         try {
-            long[] requests = dataStore.get(key, prevWindowStartTime, currentWindowStartTime);
-            prevRequests = requests[0];
-            currentRequests = requests[1];
-        } catch (Exception e) {
+//            long[] requests = dataStore.get(key, prevWindowStartTime, currentWindowStartTime);
+            prevRequests = abuseLimitService.getData(key+"::"+prevWindowStartTime).getCount();
+            currentRequests = abuseLimitService.getData(key+"::"+currentWindowStartTime).getCount();
+        }
+        catch (NullPointerException e){
+            limitStatus = new LimitStatus();
+            limitStatus.setLimited(false);
+            return limitStatus;
+        }
+        catch (Exception e) {
             throw new Exception("Error while getting requests count from data store", e);
         }
 
         Duration durationFromCurrWindow = Duration.between(currentWindowStartTime, LocalDateTime.now());
 
         double rate = ((windowSize.toMillis() - durationFromCurrWindow.toMillis()) / (double) windowSize.toMillis()) * prevRequests + currentRequests;
-        LimitStatus limitStatus = new LimitStatus();
+        limitStatus = new LimitStatus();
 
+        requestsLimit = 5;
         if (rate >= requestsLimit) {
             limitStatus.setLimited(true);
             Duration limitDuration = calcLimitDuration(prevRequests, currentRequests, durationFromCurrWindow);

@@ -3,6 +3,7 @@ package com.totoro.AntiAbuse.couchbase.service;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.couchbase.repository.AbuseLimitRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class AbuseLimitService implements CouchService<AbuseLimitDocument> {
 
     @Override
     public AbuseLimitDocument getData(String id) {
-        return null;
+        return limitRepository.findById(id).orElse(null);
     }
 
     @Override
