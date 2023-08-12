@@ -47,7 +47,7 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
         try {
             baseMapping
                     .mapEntity(AbuseLogDocument.class, logTemplate())
-                    .mapEntity(AbuseRuleDocument.class, abuseTemplate())
+                    .mapEntity(AbuseRuleDocument.class, ruleTemplate())
                     .mapEntity(AbuseLimitDocument.class, limitTemplate());
         } catch (Exception e) {
             throw e;
@@ -65,14 +65,14 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
         return new CouchbaseTemplate(logClientFactory(), new MappingCouchbaseConverter());
     }
 
-    @Bean("abuseClientFactory")
-    public CouchbaseClientFactory abuseClientFactory(){
-        return new SimpleCouchbaseClientFactory(getConnectionString(),authenticator(), couchClusterProperties.getBucketAbuse().getName());
+    @Bean("ruleClientFactory")
+    public CouchbaseClientFactory ruleClientFactory(){
+        return new SimpleCouchbaseClientFactory(getConnectionString(),authenticator(), couchClusterProperties.getBucketAbuseRule().getName());
     }
 
-    @Bean("abuseTemplate")
-    public CouchbaseTemplate abuseTemplate(){
-        return new CouchbaseTemplate(abuseClientFactory(), new MappingCouchbaseConverter());
+    @Bean("ruleTemplate")
+    public CouchbaseTemplate ruleTemplate(){
+        return new CouchbaseTemplate(ruleClientFactory(), new MappingCouchbaseConverter());
     }
 
     @Bean("limitClientFactory")

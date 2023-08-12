@@ -1,6 +1,8 @@
 package com.totoro.AntiAbuse.tools.storage;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -8,8 +10,9 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Rule {
-    private long requestsLimit;
+    private int requestsLimit;
     private long firstVisitLimit;
     private List<AbuseDomain> domains;
     private List<String> keywords;
@@ -17,7 +20,8 @@ public class Rule {
     private List<String> whiteUserAgent;
     private List<String> blackUserAgent;
 
-    public Rule(){
+    public Rule(int i) {
+        this.requestsLimit = i;
         this.domains = new ArrayList<>();
         this.keywords = new ArrayList<>();
         this.notKeywords = new ArrayList<>();
@@ -26,7 +30,7 @@ public class Rule {
     }
 
     public static Rule fromJson(String toString) {
-        return new Rule();
+        return new Rule(5);
     }
 
 }

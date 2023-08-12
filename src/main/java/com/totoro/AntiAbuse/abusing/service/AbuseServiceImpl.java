@@ -10,6 +10,7 @@ import com.totoro.AntiAbuse.core.RateLimiter;
 import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
+import com.totoro.AntiAbuse.tools.storage.Rule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,17 +26,17 @@ import static com.totoro.AntiAbuse.utils.RequestUtils.*;
 @Service
 @RequiredArgsConstructor
 public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
-    //Todo RateLimiters 인스턴스 재활용
+    //Todo RateLimiters rule 인스턴스 재활용
 
     private final CouchService<AbuseLogDocument> abuseLogService;
     private final CouchService<AbuseRuleDocument> abuseRuleService;
     private final CouchService<AbuseLimitDocument> abuseLimitService;
-    private Map<String, RateLimiter> rateLimiters = new HashMap<>();
+    private static Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
 //        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
-//        abuseService.addData(AbuseDocument.builder().type("rule").rule(new Rule()).build());
+//        abuseRuleService.addData(AbuseRuleDocument.builder().type("rule").rule(new Rule(5)).build());
 //        abuseLimitService.addData(new AbuseLimitDocument("1","2","3","4",5));
         return check(requestDTO);
     }
@@ -46,20 +47,21 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     }
 
     @Override
-    public TotoroResponse<AbuseResponseDto> updateRule() {
-//        abuseService.getData()
-        return null;
-    }
+    public RateLimiter updateRule() {
+        AbuseRuleDocument abuseRule = abuseRuleService.getData("rule");
 
-    //ToDo response from 데이터 만들기
+        int requestsLimit = abuseRule.getRule().getRequestsLimit();
+        RateLimiter commonRateLimiter = RateLimiter.builder().requestsLimit(requestsLimit).abuseLimitService(abuseLimitService).build();
+
+        rateLimiters.put("common", commonRateLimiter);
+        //TODO CB에 존재하는 공통 요청에 대한 공통 RateLimiter 생성
+
+        return commonRateLimiter;
+    }
     private TotoroResponse<AbuseResponseDto> check(AbuseRequestDto req) throws Exception {
 
         RateLimiter rateLimiter = findRateLimiter(req);
-        if ( rateLimiter == null ){
-            rateLimiter = new RateLimiter(abuseLimitService);
-            rateLimiter.getUrls().put(req.getUrl(), 1);
-            rateLimiters.put(req.getDomain(), rateLimiter);
-        }
+
 //        RateLimiter rateLimiter = new RateLimiter(abuseLimitService);
 
 
@@ -101,25 +103,24 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 //        }
 
 
-        String key = req.generateKey();
-        LimitStatus limitStatus = rateLimiter.check(key);
+            String key = req.generateKey();
+            LimitStatus limitStatus = rateLimiter.check(key);
 
-        if (limitStatus.isLimited()) {
-            AbuseLogDto dto = AbuseLogDto.createNewLog(req, "Limited");
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-            return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
-                                   .build();
+            if (limitStatus.isLimited()) {
+                AbuseLogDto dto = AbuseLogDto.createNewLog(req, "Limited");
+                abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+                return TotoroResponse.<AbuseResponseDto>from()
+                        .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
+                        .build();
 
-        } else {
-            rateLimiter.incrementKey(key);
-            return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc", limitStatus.getCurrentRate(),limitStatus.getCurrentRemainRequests()))
-                                   .build();
+            } else {
+                rateLimiter.incrementKey(key);
+                return TotoroResponse.<AbuseResponseDto>from()
+                        .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc", limitStatus.getCurrentRate(),limitStatus.getCurrentRemainRequests()))
+                        .build();
+            }
         }
-    }
-
-    private boolean ipValidCheck(AbuseRequestDto req) {
+        private boolean ipValidCheck(AbuseRequestDto req) {
         String fsId = req.getFsId();
         if (req.getPcId() != null && fsId != null && fsId.length() == 20) {
             String ipAddress = fsId.substring(6, 14);
@@ -143,15 +144,27 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     }
 
     private RateLimiter findRateLimiter(AbuseRequestDto req) {
-        if (rateLimiters.containsKey(req.getDomain())) {
-            RateLimiter rateLimiter = rateLimiters.get(req.getDomain());
+        return ruleRateLimiter(req);
+    }
+
+    private RateLimiter ruleRateLimiter(AbuseRequestDto req){
+        RateLimiter rateLimiter;
+        if(rateLimiters.containsKey(req.getDomain())){
+            rateLimiter = rateLimiters.get(req.getDomain());
             if (rateLimiter.getUrls().containsKey(req.getUrl())) {
-                System.out.println("1111111111edasdadssssssss");
                 return rateLimiter;
             }
         }
-        return null;
+        return getCommonRateLimiter();
     }
+    private RateLimiter getCommonRateLimiter() {
+        RateLimiter commonRateLimiter = rateLimiters.get("common");
+        if (commonRateLimiter == null) {
+            return updateRule();
+        }
+        return commonRateLimiter;
+    }
+
     private Boolean isFirstVisit(AbuseRequestDto req) {
         if (req.getPcId() == null && req.getFsId() == null) {
             AbuseLogDto logDto = AbuseLogDto.createNewLog(req, FIRST_VISIT);

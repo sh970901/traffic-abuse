@@ -35,7 +35,8 @@ public class AbuseController {
 
     @PostMapping("/update/rule")
     public TotoroResponse<AbuseResponseDto> updateRule() throws Exception {
-        return abuseService.updateRule();
+        abuseService.updateRule();
+        return TotoroResponse.<AbuseResponseDto>from().build();
     }
 
     @GetMapping("/test")

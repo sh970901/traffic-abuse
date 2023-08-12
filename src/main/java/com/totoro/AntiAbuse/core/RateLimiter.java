@@ -3,6 +3,7 @@ package com.totoro.AntiAbuse.core;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -11,16 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
+@Builder
 public class RateLimiter {
-    private static final int requestsLimit = 5;
+    private int requestsLimit;
     private final Duration windowSize = Duration.ofMinutes(1);
     private Map<String, Integer> urls = new HashMap<>();
 
     private CouchService<AbuseLimitDocument> abuseLimitService;
 
-    public RateLimiter(CouchService<AbuseLimitDocument> abuseLimitService){
-        this.abuseLimitService = abuseLimitService;
-    }
     public void incrementKey(String key) throws Exception {
         LocalDateTime currentWindow = truncateToMinutes(LocalDateTime.now());
         abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
