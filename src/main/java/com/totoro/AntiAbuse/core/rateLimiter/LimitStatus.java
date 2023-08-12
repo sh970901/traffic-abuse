@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.tools.storage;
+package com.totoro.AntiAbuse.core.rateLimiter;
 
 import lombok.Getter;
 import lombok.Setter;

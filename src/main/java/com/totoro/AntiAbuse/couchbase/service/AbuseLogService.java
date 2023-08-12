@@ -32,15 +32,5 @@ public class AbuseLogService implements CouchService<AbuseLogDocument> {
     public AbuseLogDocument saveForce(AbuseLogDocument logDocument){
         return logRepository.save(logDocument);
     }
-//        public void addLog(AbuseLog log) {
-//        String id = log.generateId();
-//        JsonObject jsonObject = JsonObject.fromJson(log.toJson());
-//        if (!existLog(id)) {
-//            logBucket.defaultCollection().insert(id, jsonObject);
-//        } else {
-//            Collection collection = logBucket.defaultCollection();
-//            collection.mutateIn(id, Collections.singletonList(MutateInSpec.increment("count", 1)));
-//        }
-//    }
 
 }

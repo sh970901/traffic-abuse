@@ -34,15 +34,5 @@ public class AbuseLimitService implements CouchService<AbuseLimitDocument> {
     public AbuseLimitDocument saveForce(AbuseLimitDocument data) {
         return limitRepository.save(data);
     }
-//        public void addLog(AbuseLog log) {
-//        String id = log.generateId();
-//        JsonObject jsonObject = JsonObject.fromJson(log.toJson());
-//        if (!existLog(id)) {
-//            logBucket.defaultCollection().insert(id, jsonObject);
-//        } else {
-//            Collection collection = logBucket.defaultCollection();
-//            collection.mutateIn(id, Collections.singletonList(MutateInSpec.increment("count", 1)));
-//        }
-//    }
 
 }

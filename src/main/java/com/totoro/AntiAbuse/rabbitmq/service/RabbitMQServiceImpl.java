@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class RabbitMQServiceImpl implements RabbitMQService{
+    //TODO 업데이트 된 Rule, BlackList를 실시간으로 받아 처리하기 위한 큐를 사용
     private final RabbitTemplate rabbitTemplate;
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;

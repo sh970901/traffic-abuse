@@ -6,13 +6,16 @@ import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
-import com.totoro.AntiAbuse.core.RateLimiter;
+import com.totoro.AntiAbuse.core.rateLimiter.RateLimiter;
 import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
-import com.totoro.AntiAbuse.tools.storage.LimitStatus;
+import com.totoro.AntiAbuse.tools.storage.Blacklist;
+import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
 import com.totoro.AntiAbuse.tools.storage.Rule;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,10 +24,9 @@ import java.util.Map;
 import static com.totoro.AntiAbuse.AbuseContext.*;
 import static com.totoro.AntiAbuse.utils.RequestUtils.*;
 
-// https://www.mimul.com/blog/about-rate-limit-algorithm/
-// Sliding Window Counter 수식 참고
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     //Todo RateLimiters rule 인스턴스 재활용
 
@@ -32,12 +34,10 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     private final CouchService<AbuseRuleDocument> abuseRuleService;
     private final CouchService<AbuseLimitDocument> abuseLimitService;
     private static Map<String, RateLimiter> rateLimiters = new HashMap<>();
+    private static int firstVisitLimit = 20;
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
-//        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
-//        abuseRuleService.addData(AbuseRuleDocument.builder().type("rule").rule(new Rule(5)).build());
-//        abuseLimitService.addData(new AbuseLimitDocument("1","2","3","4",5));
         return check(requestDTO);
     }
 
@@ -49,21 +49,38 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     @Override
     public RateLimiter updateRule() {
         AbuseRuleDocument abuseRule = abuseRuleService.getData("rule");
-
         int requestsLimit = abuseRule.getRule().getRequestsLimit();
+
+        // rule document에 정의된 값으로 업데이트
         RateLimiter commonRateLimiter = RateLimiter.builder().requestsLimit(requestsLimit).abuseLimitService(abuseLimitService).build();
-
         rateLimiters.put("common", commonRateLimiter);
-        //TODO CB에 존재하는 공통 요청에 대한 공통 RateLimiter 생성
+        blackUserAgent = abuseRule.getRule().getBlackUserAgent();
+        whiteUserAgent = abuseRule.getRule().getWhiteUserAgent();
+        firstVisitLimit = abuseRule.getRule().getFirstVisitLimit();
 
+        log.info("updateRule");
         return commonRateLimiter;
+    }
+
+    @Override
+    public void updateBlackList() {
+        AbuseRuleDocument abuseRule = abuseRuleService.getData("blacklist");
+        memberIds = abuseRule.getBlacklist().getMemberIds();
+        ipAddress = abuseRule.getBlacklist().getIpAddress();
+        log.info("updateBlackList");
+    }
+
+    @PostConstruct
+    private void init() {
+        //TODO 값을 넣어줄 때는 DTO를 사용하도록 수정
+        abuseRuleService.addData(AbuseRuleDocument.builder().type("rule").rule(new Rule(5, whiteUserAgent, blackUserAgent)).build());
+        abuseRuleService.addData(AbuseRuleDocument.builder().type("blacklist").blacklist(new Blacklist(ipAddress, memberIds)).build());
+//        abuseLimitService.addData(new AbuseLimitDocument("1","2","3","4",5));
+//        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
     }
     private TotoroResponse<AbuseResponseDto> check(AbuseRequestDto req) throws Exception {
 
         RateLimiter rateLimiter = findRateLimiter(req);
-
-//        RateLimiter rateLimiter = new RateLimiter(abuseLimitService);
-
 
 //        if (isWhiteUserAgent(req.getUserAgent())) {
 //            return TotoroResponse.<AbuseResponseDto>from()
@@ -120,7 +137,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
                         .build();
             }
         }
-        private boolean ipValidCheck(AbuseRequestDto req) {
+    private boolean ipValidCheck(AbuseRequestDto req) {
         String fsId = req.getFsId();
         if (req.getPcId() != null && fsId != null && fsId.length() == 20) {
             String ipAddress = fsId.substring(6, 14);
@@ -169,11 +186,10 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         if (req.getPcId() == null && req.getFsId() == null) {
             AbuseLogDto logDto = AbuseLogDto.createNewLog(req, FIRST_VISIT);
 
-            int firstVisitLimit = 10;
             AbuseLogDocument logDocument = abuseLogService.getData(logDto.generateId());
             if (logDocument != null) {
                 if (logDocument.getCount() > firstVisitLimit) {
-                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 10을 넘길 경우
+                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 firstVisitLimit을 넘길 경우
                     logDto.setCount(firstVisitLimit);
                     // count 초기화 한 값을 다시 저장해야하나?
                     abuseLogService.saveForce(AbuseLogDocument.convertDtoToDocument(logDto));

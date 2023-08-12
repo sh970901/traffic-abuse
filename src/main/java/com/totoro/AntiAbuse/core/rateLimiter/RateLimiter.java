@@ -1,8 +1,8 @@
-package com.totoro.AntiAbuse.core;
+package com.totoro.AntiAbuse.core.rateLimiter;
 
+import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
-import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -68,8 +68,15 @@ public class RateLimiter {
     }
 
     private Duration calcLimitDuration(long prevRequests, long currentRequests, Duration durationFromCurrWindow) {
+        // r.requestsLimit = x * prevRequests + currentRequests : requestsLimit 에 딱맞는 이전 요청 개수를 정하는 x 값을 계산
+        // 그 다음에 (1.0 - x) * windowSize : x 값으로 현재 윈도우 시작시간부터 요청이 거부되지 않을 기간 계산
+        // 그 다음에 ((1.0 - x) * windowSize) - durationFromCurrWindow : 요청이 블락되지 않을 기간에 durationFromCurrWindow 빼서 요청 거부(블락) 시간을 계산
+        // ---
+        // 이전 요청 값이 0 인데, 요청 거부 기간 계산이 필요하다는 것은 다음 윈도우에서 요청 거부가 해제된다는 것을 의미한다.
+        // x * currentRequests + nextWindowValue = r.requestsLimit 수식으로 x 값을 계산해야 한다.
         Duration limitDuration;
         if (prevRequests == 0) {
+            // currentRequests 가 prevRequests 가 되고, 요청은 계속 거부되어서 currentRequests 는 0 인 다음 윈도우에서 차단 해제 된다고 가정
             if (currentRequests != 0) {
                 double nextWindowUnblockPoint = windowSize.toMillis() * (1.0 - ((double) requestsLimit / currentRequests));
                 Duration durationToNextWindow = windowSize.minus(durationFromCurrWindow);

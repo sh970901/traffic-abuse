@@ -6,18 +6,25 @@ import java.net.UnknownHostException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class RequestUtils {
-    public static final List<String> whiteUserAgent = Arrays.asList(
+    public static List<String> whiteUserAgent = Arrays.asList(
             "http://naver.me/spd",
             "http://www.google.com/bot.html"
     );
 
-    public static final List<String> blackUserAgent = Arrays.asList(
+    public static List<String> blackUserAgent = Arrays.asList(
             "scrapy", "Java", "python", "Apache-HttpClient",
             "The Knowledge AI", "Snoopy"
+    );
+    public static List<String> ipAddress = Arrays.asList(
+            "10.0.0.1"
+    );
+    public static List<String> memberIds = Arrays.asList(
+            "aaddss"
     );
 
     public static String getIpAddress(String temp) {
