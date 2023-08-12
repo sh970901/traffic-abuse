@@ -1,23 +1,19 @@
 package com.totoro.AntiAbuse.abusing.service;
 
-import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
 import com.totoro.AntiAbuse.core.RateLimiter;
 import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
-import com.totoro.AntiAbuse.tools.storage.Blacklist;
-import com.totoro.AntiAbuse.tools.storage.Limit;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
-import com.totoro.AntiAbuse.tools.storage.Rule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +27,8 @@ import static com.totoro.AntiAbuse.utils.RequestUtils.*;
 public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     //Todo RateLimiters 인스턴스 재활용
 
-    private final RateLimiter commonRateLimiter;
     private final CouchService<AbuseLogDocument> abuseLogService;
-    private final CouchService<AbuseDocument> abuseService;
+    private final CouchService<AbuseRuleDocument> abuseRuleService;
     private final CouchService<AbuseLimitDocument> abuseLimitService;
     private Map<String, RateLimiter> rateLimiters = new HashMap<>();
     @Override
@@ -42,7 +37,6 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 //        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
 //        abuseService.addData(AbuseDocument.builder().type("rule").rule(new Rule()).build());
 //        abuseLimitService.addData(new AbuseLimitDocument("1","2","3","4",5));
-        //Limit 객체의 Inc 함수를 abuseLimitService 사용하도록 로직을 변경해야함
         return check(requestDTO);
     }
 
@@ -51,13 +45,23 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         return check(requestDTO);
     }
 
+    @Override
+    public TotoroResponse<AbuseResponseDto> updateRule() {
+//        abuseService.getData()
+        return null;
+    }
+
     //ToDo response from 데이터 만들기
     private TotoroResponse<AbuseResponseDto> check(AbuseRequestDto req) throws Exception {
 
         RateLimiter rateLimiter = findRateLimiter(req);
-        if(rateLimiter == null) rateLimiter = commonRateLimiter;
+        if ( rateLimiter == null ){
+            rateLimiter = new RateLimiter(abuseLimitService);
+            rateLimiter.getUrls().put(req.getUrl(), 1);
+            rateLimiters.put(req.getDomain(), rateLimiter);
+        }
+//        RateLimiter rateLimiter = new RateLimiter(abuseLimitService);
 
-//        rateLimiter.incrementKey(req.generateKey());
 
 //        if (isWhiteUserAgent(req.getUserAgent())) {
 //            return TotoroResponse.<AbuseResponseDto>from()
@@ -142,12 +146,12 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         if (rateLimiters.containsKey(req.getDomain())) {
             RateLimiter rateLimiter = rateLimiters.get(req.getDomain());
             if (rateLimiter.getUrls().containsKey(req.getUrl())) {
+                System.out.println("1111111111edasdadssssssss");
                 return rateLimiter;
             }
         }
         return null;
     }
-
     private Boolean isFirstVisit(AbuseRequestDto req) {
         if (req.getPcId() == null && req.getFsId() == null) {
             AbuseLogDto logDto = AbuseLogDto.createNewLog(req, FIRST_VISIT);
@@ -173,5 +177,6 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         }
         return true;
     }
+
 
 }

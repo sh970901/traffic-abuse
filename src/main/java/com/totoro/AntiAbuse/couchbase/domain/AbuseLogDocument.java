@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing.domain;
+package com.totoro.AntiAbuse.couchbase.domain;
 
 import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import lombok.AllArgsConstructor;

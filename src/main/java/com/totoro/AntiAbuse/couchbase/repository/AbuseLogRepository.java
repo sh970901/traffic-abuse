@@ -1,7 +1,7 @@
 package com.totoro.AntiAbuse.couchbase.repository;
 
 
-import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
 import org.springframework.data.couchbase.repository.Query;
 
 import java.util.Optional;

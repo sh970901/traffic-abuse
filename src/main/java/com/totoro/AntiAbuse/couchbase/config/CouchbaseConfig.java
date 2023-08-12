@@ -1,8 +1,8 @@
 package com.totoro.AntiAbuse.couchbase.config;
 
-import com.totoro.AntiAbuse.abusing.domain.AbuseDocument;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
 import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +47,7 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
         try {
             baseMapping
                     .mapEntity(AbuseLogDocument.class, logTemplate())
-                    .mapEntity(AbuseDocument.class, abuseTemplate())
+                    .mapEntity(AbuseRuleDocument.class, abuseTemplate())
                     .mapEntity(AbuseLimitDocument.class, limitTemplate());
         } catch (Exception e) {
             throw e;

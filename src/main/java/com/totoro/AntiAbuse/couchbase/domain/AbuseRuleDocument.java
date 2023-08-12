@@ -1,4 +1,4 @@
-package com.totoro.AntiAbuse.abusing.domain;
+package com.totoro.AntiAbuse.couchbase.domain;
 
 import com.totoro.AntiAbuse.tools.storage.Rule;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @Document
-public class AbuseDocument implements Serializable {
+public class AbuseRuleDocument implements Serializable {
     private static final long serialVersionUID = 7330101427517450936L;
 
     @Id

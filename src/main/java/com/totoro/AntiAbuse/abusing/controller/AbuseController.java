@@ -22,8 +22,6 @@ import java.time.LocalDateTime;
 public class AbuseController {
     private final AbuseService<AbuseResponseDto> abuseService;
 
-    private final RateLimiter commonRateLimiter;
-
 
     @PostMapping("/check-abuse")
     public TotoroResponse<AbuseResponseDto> httpCheckAbuse(HttpServletRequest request) throws Exception {
@@ -35,9 +33,14 @@ public class AbuseController {
         return abuseService.checkAbuse(requestDTO);
     }
 
+    @PostMapping("/update/rule")
+    public TotoroResponse<AbuseResponseDto> updateRule() throws Exception {
+        return abuseService.updateRule();
+    }
+
     @GetMapping("/test")
     public String test(){
-        RateLimiter rateLimiter = new RateLimiter();
+//        RateLimiter rateLimiter = new RateLimiter();
         return "ok";
     }
 

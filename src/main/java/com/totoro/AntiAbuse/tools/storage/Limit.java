@@ -1,10 +1,6 @@
 package com.totoro.AntiAbuse.tools.storage;
 
-import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
-import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 

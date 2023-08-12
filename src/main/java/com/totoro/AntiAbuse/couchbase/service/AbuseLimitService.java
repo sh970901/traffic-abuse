@@ -1,9 +1,7 @@
 package com.totoro.AntiAbuse.couchbase.service;
 
-import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
-import com.totoro.AntiAbuse.abusing.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.repository.AbuseLimitRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

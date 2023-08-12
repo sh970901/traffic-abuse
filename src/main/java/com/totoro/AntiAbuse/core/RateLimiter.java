@@ -1,31 +1,31 @@
 package com.totoro.AntiAbuse.core;
 
-import com.totoro.AntiAbuse.abusing.domain.AbuseLimitDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
-import com.totoro.AntiAbuse.tools.storage.AbuseLimitStore;
 import com.totoro.AntiAbuse.tools.storage.LimitStatus;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
-@Component
 @Getter
 public class RateLimiter {
-    private int requestsLimit;
+    private static final int requestsLimit = 5;
     private final Duration windowSize = Duration.ofMinutes(1);
-    private Map<String, Integer> urls;
+    private Map<String, Integer> urls = new HashMap<>();
 
-    @Autowired
     private CouchService<AbuseLimitDocument> abuseLimitService;
 
+    public RateLimiter(CouchService<AbuseLimitDocument> abuseLimitService){
+        this.abuseLimitService = abuseLimitService;
+    }
     public void incrementKey(String key) throws Exception {
         LocalDateTime currentWindow = truncateToMinutes(LocalDateTime.now());
         abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
     }
+
 
     //https://www.mimul.com/blog/about-rate-limit-algorithm/
     //Sliding Window Counter -> 이전 요청의 비율과 현재 요청을 합하여 count 계산
@@ -58,7 +58,6 @@ public class RateLimiter {
         double rate = ((windowSize.toMillis() - durationFromCurrWindow.toMillis()) / (double) windowSize.toMillis()) * prevRequests + currentRequests;
         limitStatus = new LimitStatus();
 
-        requestsLimit = 5;
         if (rate >= requestsLimit) {
             limitStatus.setLimited(true);
             Duration limitDuration = calcLimitDuration(prevRequests, currentRequests, durationFromCurrWindow);
