@@ -12,5 +12,4 @@ public class LimitStatus {
     private Duration limitDuration;
     private double currentRate;
     private long currentRemainRequests;
-
 }

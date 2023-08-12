@@ -13,14 +13,17 @@ public class AbuseResponseDto {
 
     private String message;
 
+    private double currentRate;
+    private long currentRemainRequests;
+
         // 요청을 어뷰징으로 판단
     public static AbuseResponseDto abuse(String blockTime, String message){
         return AbuseResponseDto.from().block(true).blockTime(blockTime).message(message).build();
     }
 
     //요청을 정상으로 판단
-    public static AbuseResponseDto nonAbuse(String blockTime, String message){
-        return AbuseResponseDto.from().block(false).blockTime(blockTime).message(message).build();
+    public static AbuseResponseDto nonAbuse(String blockTime, String message, double currentRate, long currentRemainRequests){
+        return AbuseResponseDto.from().block(false).blockTime(blockTime).message(message).currentRate(currentRate).currentRemainRequests(currentRemainRequests).build();
     }
 
 }

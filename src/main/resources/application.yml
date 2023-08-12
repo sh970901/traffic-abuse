@@ -12,7 +12,7 @@ spring:
   rabbitmq:
     host: ENC(K0R56cr7C52XtbdnKMczhpyVEmk4ud8K)
     port: 5672
-    username: ENC(Tb8awpE1J25EzpJZfeSy6wq+6WPDHH4M)
+    username: ENC(RyBm0pzeuZJYJkE9To/6DA==)
     password: ENC(OV6yk8pEddLU0FfK9ByziJEuLKN4dzMi)
 
 jasypt:

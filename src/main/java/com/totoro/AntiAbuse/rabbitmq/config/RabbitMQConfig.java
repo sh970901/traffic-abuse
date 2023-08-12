@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
 public class RabbitMQConfig {
     private final RabbitMQProperties rabbitMQProperties;
@@ -30,32 +30,26 @@ public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.password}")
     private String rabbitmqPassword;
+    @Value("${rabbitmq.queue.name}")
     private String queueName;
+    @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
+    @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
-    public String getQueueName() {
-        return rabbitMQProperties.getQueueName();
-    }
-    public String getExchangeName() {
-        return rabbitMQProperties.getExchangeName();
-    }
-    public String getRoutingKey() {
-        return rabbitMQProperties.getRoutingKey();
-    }
 
     @Bean
     public Queue queue() {
-        return new Queue(getQueueName());
+        return new Queue(queueName);
     }
 
     @Bean
     public DirectExchange exchange() {
-        return new DirectExchange(getExchangeName());
+        return new DirectExchange(exchangeName);
     }
     @Bean
     public Binding binding(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(getRoutingKey());
+        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
 
     @Bean

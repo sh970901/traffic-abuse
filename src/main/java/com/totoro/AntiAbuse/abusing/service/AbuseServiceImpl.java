@@ -29,6 +29,7 @@ import static com.totoro.AntiAbuse.utils.RequestUtils.*;
 @Service
 @RequiredArgsConstructor
 public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
+    //Todo RateLimiters 인스턴스 재활용
 
     private final RateLimiter commonRateLimiter;
     private final CouchService<AbuseLogDocument> abuseLogService;
@@ -58,11 +59,11 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
 //        rateLimiter.incrementKey(req.generateKey());
 
-        if (isWhiteUserAgent(req.getUserAgent())) {
-            return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
-                                   .build();
-        }
+//        if (isWhiteUserAgent(req.getUserAgent())) {
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
+//                                   .build();
+//        }
 //
 //        if(isBlackOrNullUser(req)){
 //            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
@@ -109,7 +110,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         } else {
             rateLimiter.incrementKey(key);
             return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc"))
+                                   .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc", limitStatus.getCurrentRate(),limitStatus.getCurrentRemainRequests()))
                                    .build();
         }
     }

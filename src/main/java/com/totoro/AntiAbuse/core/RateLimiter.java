@@ -27,24 +27,27 @@ public class RateLimiter {
         abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
     }
 
-    // ToDo: Exception 처리, 이전 요청이 없을 경우 모두 PASS 되는 걸 막아야함
-
+    //https://www.mimul.com/blog/about-rate-limit-algorithm/
+    //Sliding Window Counter -> 이전 요청의 비율과 현재 요청을 합하여 count 계산
     public LimitStatus check(String key) throws Exception {
         LocalDateTime currentWindowStartTime = truncateToMinutes(LocalDateTime.now()); // 현재 윈도우 시작 시간
         LocalDateTime prevWindowStartTime = currentWindowStartTime.minus(windowSize); //이전 윈도우 시작 시간
         LimitStatus limitStatus;
 
-        //1분에 하나씩 limitDocument를 생성하고 count를 증가하는 방식
         long prevRequests, currentRequests;
         try {
-//            long[] requests = dataStore.get(key, prevWindowStartTime, currentWindowStartTime);
-            prevRequests = abuseLimitService.getData(key+"::"+prevWindowStartTime).getCount();
-            currentRequests = abuseLimitService.getData(key+"::"+currentWindowStartTime).getCount();
-        }
-        catch (NullPointerException e){
-            limitStatus = new LimitStatus();
-            limitStatus.setLimited(false);
-            return limitStatus;
+            AbuseLimitDocument prevLimit = abuseLimitService.getData(key + "::" + prevWindowStartTime);
+            if( prevLimit == null ){
+                prevRequests = 0;
+            } else {
+                prevRequests = prevLimit.getCount();
+            }
+            AbuseLimitDocument currentLimit = abuseLimitService.getData(key + "::" + currentWindowStartTime);
+            if( currentLimit == null ){
+                currentRequests = 0;
+            } else {
+                currentRequests = currentLimit.getCount();
+            }
         }
         catch (Exception e) {
             throw new Exception("Error while getting requests count from data store", e);
