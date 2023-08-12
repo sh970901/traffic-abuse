@@ -58,11 +58,11 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
 //        rateLimiter.incrementKey(req.generateKey());
 
-//        if (isWhiteUserAgent(req.getUserAgent())) {
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
-//                                   .build();
-//        }
+        if (isWhiteUserAgent(req.getUserAgent())) {
+            return TotoroResponse.<AbuseResponseDto>from()
+                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
+                                   .build();
+        }
 //
 //        if(isBlackOrNullUser(req)){
 //            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());

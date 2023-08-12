@@ -20,12 +20,12 @@ jasypt:
     bean: jasyptStringEncryptor
 
 couchbase:
-  connection-string: ENC(Il6lCfMZJx6CUSrTRUeihEb5aJzuD5vno21sisl8f3FQHhVXWZwjBg==)
-#  connection-string: ENC(Qp9iMFzXOstAUc2b9KNItwxUloO85ciyymNXt9Sxvx0=)
+#  connection-string: ENC(Il6lCfMZJx6CUSrTRUeihEb5aJzuD5vno21sisl8f3FQHhVXWZwjBg==)
+  connection-string: ENC(Qp9iMFzXOstAUc2b9KNItwxUloO85ciyymNXt9Sxvx0=)
   username: ENC(nBzV1KeBwgKxwGiUxaVX/mlNcV69mtP1)
   password: ENC(OVGKDlSCauyWNaLjs/+iA7uV2vxFFzDs)
   bucket-abuse-log:
-    name: abuse-log
+    name: abuse_log
     user-name: ENC(/8bBBRalNsIJMf8SpkAma9OMy+YGnnHa)
     password: ENC(JLA3+d6AiRDRvob0jgIM0aV2d5X8lw8R)
   bucket-abuse:
@@ -33,7 +33,7 @@ couchbase:
     user-name: ENC(afBFdIW2E88Bn2I7qt31oPRGkdCu8QIG)
     password: ENC(JwBAtf9XXlQsFi/UZ98UPjj2b8oqN2tU)
   bucket-abuse-limit:
-    name: abuse-limit
+    name: abuse_limit
     user-name: ENC(x1VEuHwGL6ytaJImxk7ZkT6jUqxIUTDP)
     password: ENC(93wqqZ9Gpug60fZc5TqO1OoBuVp1VCfb)
 
