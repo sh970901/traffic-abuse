@@ -9,6 +9,11 @@ spring:
       - prod
   jpa:
     open-in-view: false
+  rabbitmq:
+    host: ENC(K0R56cr7C52XtbdnKMczhpyVEmk4ud8K)
+    port: 5672
+    username: ENC(Tb8awpE1J25EzpJZfeSy6wq+6WPDHH4M)
+    password: ENC(OV6yk8pEddLU0FfK9ByziJEuLKN4dzMi)
 
 jasypt:
   encryptor:
@@ -21,16 +26,21 @@ couchbase:
   password: ENC(OVGKDlSCauyWNaLjs/+iA7uV2vxFFzDs)
   bucket-abuse-log:
     name: abuse-log
-    user-name: dev-admin
-    password: dev-admin
+    user-name: ENC(/8bBBRalNsIJMf8SpkAma9OMy+YGnnHa)
+    password: ENC(JLA3+d6AiRDRvob0jgIM0aV2d5X8lw8R)
   bucket-abuse:
     name: abuse
-    user-name: dev-admin
-    password: dev-admin
+    user-name: ENC(afBFdIW2E88Bn2I7qt31oPRGkdCu8QIG)
+    password: ENC(JwBAtf9XXlQsFi/UZ98UPjj2b8oqN2tU)
   bucket-abuse-limit:
     name: abuse-limit
-    user-name: dev-admin
-    password: dev-admin
+    user-name: ENC(x1VEuHwGL6ytaJImxk7ZkT6jUqxIUTDP)
+    password: ENC(93wqqZ9Gpug60fZc5TqO1OoBuVp1VCfb)
+
+rabbitmq:
+  queue.name: sample.queue
+  exchange.name: sample.exchange
+  routing.key: sample.key
 
 logging:
   level:

@@ -139,9 +139,9 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
     private RateLimiter findRateLimiter(AbuseRequestDto req) {
         if (rateLimiters.containsKey(req.getDomain())) {
-            RateLimiter val = rateLimiters.get(req.getDomain());
-            if (val.getUrls().containsKey(req.getUrl())) {
-                return val;
+            RateLimiter rateLimiter = rateLimiters.get(req.getDomain());
+            if (rateLimiter.getUrls().containsKey(req.getUrl())) {
+                return rateLimiter;
             }
         }
         return null;

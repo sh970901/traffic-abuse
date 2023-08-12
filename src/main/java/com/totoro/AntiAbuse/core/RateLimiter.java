@@ -27,7 +27,7 @@ public class RateLimiter {
         abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
     }
 
-    // ToDo: Exception 처리
+    // ToDo: Exception 처리, 이전 요청이 없을 경우 모두 PASS 되는 걸 막아야함
 
     public LimitStatus check(String key) throws Exception {
         LocalDateTime currentWindowStartTime = truncateToMinutes(LocalDateTime.now()); // 현재 윈도우 시작 시간
