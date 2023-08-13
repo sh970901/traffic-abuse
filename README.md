@@ -25,14 +25,22 @@
 <br/>
 
 ---
-<h3>Sliding Window Counter</h3>
+<h3>Application Architecture</h3>
+![img.png](img/application-architecture.png)
 
-![img.png](img/img.png)
+---
+<h3>RateLimiter Algorithm</h3>
+<h5>Sliding Window Counter</h5>
+
+![img.png](img/Sliding-Window-Counter.png)
 
 분당 10건 처리한다면 1분안에 9건의 요청이 오고 1분과 2분 사이에는 5건이 요청온다고 가정.
-1분 15초에 요청이 왔는데 1분 15초 지점은 1분과 2분 사이에서 25% 지점, 이전 기간은 1 - 0.25 = 75% 비율로 계산해서 9 * 0.75 + 5 = 14.75 > 10으로 한도를 초과했기 때문에 요청은 거부된다. 즉, 이전 window와 현재 window의 비율값으로 계산된 합이 처리 건수를 초과하면 거부된다.
+1분 15초에 요청이 왔는데 1분 15초 지점은 1분과 2분 사이에서 25% 지점, 이전 기간은 1 - 0.25 = 75% 비율로 계산해서 9 * 0.75 + 5 = 14.75 > 10으로 한도를 초과했기 때문에 요청은 거부된다.
+<br/>즉, 이전 window와 현재 window의 비율값으로 계산된 합이 처리 건수를 초과하면 거부된다.
 1분 30초 시점에 요청이 온다면 이전 기간은 50%, 9 * 0.5 + 5 = 9.5 < 10이므로 해당 요청은 처리된다.
-<br/>참고: https://medium.com/@avocadi/rate-limiter-sliding-window-counter-7ec08dbe21d6
+<br/><br/>참고<br/>
+https://medium.com/@avocadi/rate-limiter-sliding-window-counter-7ec08dbe21d6
+https://dev.to/satrobit/rate-limiting-using-the-sliding-window-algorithm-5fjn
 
 ---
 
@@ -49,22 +57,20 @@
     }
 }
 ---
-현재 RequestsLimit은 5로 초기화된 상태 <br/>
-<br/>
+ex) RequestsLimit : 5 <br/>
 
-<br/><br/><br/><br/>
 1) 첫 요청의 경우 ( 1분 이전에 같은 요청이 없는 경우)
    1) 현재 정의해 둔 RequestsLimit(5) 이상을 1분동안 요청한 경우 Block 
    2) BlockTime이 0이 되기 전까지 block : true;
     ![first_command](https://github.com/sh970901/TOTORO/assets/79374899/6b6ce944-4a6b-4108-afbf-53f60a8a6bb2)
 
-<br/><br/><br/><br/>
+<br/><br/>
 2) 이전 요청이 있는 경우 ( 1분 이전에 같은 요청이 있는 경우 )
    1) currentRate 비율과 RequestsLimit(5)을 비교하여 Block을 결정
    2) currentRate 비율은 1분 전 요청과 현재 요청을 현재 초를 기준으로 비율을 계산 
     ![second_command](https://github.com/sh970901/TOTORO/assets/79374899/6bf60699-1c4e-4ce1-af41-6318e30fba43)
 
-<br/><br/><br/><br/>
+<br/><br/>
 3) Rule ( BlackUserAgent에 Postman을 추가한 경우 )
    1) WhiteUserAgent, WhiteList(IP), Keyword: 로직을 타지 않고 PASS
    2) BlackUserAgent, BlackList(IP), notKeyWord: 로직을 타지 않고 Block
