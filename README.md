@@ -18,13 +18,13 @@
     - 사용자 식별 값과 요청 url 등을 조합하여 유니크한 key를 생성하고 이를 활용하여 어뷰징 판단
     - HttpRequest 또는 사용자를 구분할 수 있는 식별 값을 포함한 DTO를 받아 처리
 - 비 정상접근을 DB(couchbase)에 Log를 남기며 차단 기능, 비즈니스 분석 효율을 높임
-- 블랙리스트, 화이트리스트 IP 및 UserAgent에 따른 접근 제어 기능
+- 사용자 요청 정보에 따른 접근 제어 기능
   - 웹 콘솔을 통해 RequestsLimit, BlackList, WhiteList, BlackUserAgent, WhiteUseragent, Keyword, notKeyword 제어 가능
 - 요청 값은 큐를 통해 실시간으로 Anti-Abusing 서비스에 반영
 
 <p>기타</p>
 
-- 각 요청마다 해당 API를 사용해야 하기에 적절한 ConnectionTimeout 설정 (0.2s)
+- 어플리케이션 앞단(Interceptor or Filter)에서 각 요청에 대해 어뷰징 API를 호출, 적절한 ConnectionTimeout 설정 (0.2s)
 - NoSQL DB(Couchbase), 이벤트 큐 (RabbitMQ) 설치 필요
 
 ---
@@ -39,13 +39,13 @@
    1. docker pull rabbitmq
    2. docker run -d -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq
    3. docker exec rabbitmq rabbitmq-plugins enable rabbitmq_management
-   4. console: localhost:15672 / user: guest / guest
+   4. console: localhost:15672, Login : guest / guest
    5. https://registry.hub.docker.com/_/rabbitmq/
 3. Couchbase
    1. docker pull couchbase
    2. docker run -d --name db -p 8091-8096:8091-8096 -p 11210-11211:11210-11211 couchbase
    3. console: localhost:8091
-   4. create 3 bucket / abuse_log, abuse_rule, abuse_limit
+   4. create 3 buckets / abuse_log, abuse_rule, abuse_limit
    5. https://docs.couchbase.com/server/current/install/getting-started-docker.html
 
 
