@@ -38,6 +38,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
+        System.out.println("11112333331"+request.getHeader("User-Agent"));
         return check(requestDTO);
     }
 
@@ -82,20 +83,20 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         RateLimiter rateLimiter = findRateLimiter(req);
 
-//        if (isWhiteUserAgent(req.getUserAgent())) {
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
-//                                   .build();
-//        }
-//
-//        if(isBlackOrNullUser(req)){
-//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
-//            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                    .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
-//                                    .build();
-//        }
-//
+        if (isWhiteUserAgent(req.getUserAgent())) {
+            return TotoroResponse.<AbuseResponseDto>from()
+                                   .data(AbuseResponseDto.nonAbuse(null, WHITEUSERAGENT))
+                                   .build();
+        }
+
+        if(isBlackOrNullUser(req)){
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            return TotoroResponse.<AbuseResponseDto>from()
+                                    .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
+                                    .build();
+        }
+
 //        if(!ipValidCheck(req)){
 //            AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
 //            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
@@ -104,39 +105,40 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 //                                    .build();
 //        }
 
-//        if (!isFirstVisit(req)){
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
-//                                 .build();
-//        }
+        if (!isFirstVisit(req)){
+            return TotoroResponse.<AbuseResponseDto>from()
+                                 .data(AbuseResponseDto.abuse(null, NON_FIRST_VISIT))
+                                 .build();
+        }
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
-//        if(isNullPcId(req)){
-//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
-//            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                   .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
-//                                   .build();
-//        }
-
-
-            String key = req.generateKey();
-            LimitStatus limitStatus = rateLimiter.check(key);
-
-            if (limitStatus.isLimited()) {
-                AbuseLogDto dto = AbuseLogDto.createNewLog(req, "Limited");
-                abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-                return TotoroResponse.<AbuseResponseDto>from()
-                        .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
-                        .build();
-
-            } else {
-                rateLimiter.incrementKey(key);
-                return TotoroResponse.<AbuseResponseDto>from()
-                        .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc", limitStatus.getCurrentRate(),limitStatus.getCurrentRemainRequests()))
-                        .build();
-            }
+        if(isNullPcId(req)){
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            return TotoroResponse.<AbuseResponseDto>from()
+                                   .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
+                                   .build();
         }
+        //TODO BlackList 접근 차단 추가로직 필요
+
+
+        String key = req.generateKey();
+        LimitStatus limitStatus = rateLimiter.check(key);
+
+        if (limitStatus.isLimited()) {
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, "Limited");
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            return TotoroResponse.<AbuseResponseDto>from()
+                    .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
+                    .build();
+
+        } else {
+            rateLimiter.incrementKey(key);
+            return TotoroResponse.<AbuseResponseDto>from()
+                    .data(AbuseResponseDto.nonAbuse("noBlock","KeyInc", limitStatus.getCurrentRate(),limitStatus.getCurrentRemainRequests()))
+                    .build();
+        }
+    }
     private boolean ipValidCheck(AbuseRequestDto req) {
         String fsId = req.getFsId();
         if (req.getPcId() != null && fsId != null && fsId.length() == 20) {
@@ -147,17 +149,11 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     }
 
     private Boolean isNullPcId(AbuseRequestDto req) {
-        if (req.getFsId() != null && req.getPcId() == null) {
-            return true;
-        }
-        return false;
+        return req.getFsId() != null && req.getPcId() == null;
     }
 
     private Boolean isBlackOrNullUser(AbuseRequestDto req) {
-        if (req.getUserAgent() == null || isBlackUserAgent(req.getUserAgent())) {
-            return true;
-        }
-        return false;
+        return req.getUserAgent() == null || isBlackUserAgent(req.getUserAgent());
     }
 
     private RateLimiter findRateLimiter(AbuseRequestDto req) {

@@ -25,5 +25,8 @@ public class AbuseResponseDto {
     public static AbuseResponseDto nonAbuse(String blockTime, String message, double currentRate, long currentRemainRequests){
         return AbuseResponseDto.from().block(false).blockTime(blockTime).message(message).currentRate(currentRate).currentRemainRequests(currentRemainRequests).build();
     }
+    public static AbuseResponseDto nonAbuse(String blockTime, String message){
+        return AbuseResponseDto.from().block(false).blockTime(blockTime).message(message).build();
+    }
 
 }

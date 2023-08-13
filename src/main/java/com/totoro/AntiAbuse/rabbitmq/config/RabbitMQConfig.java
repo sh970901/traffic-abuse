@@ -17,8 +17,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class RabbitMQConfig {
-    private final RabbitMQProperties rabbitMQProperties;
-
     @Value("${spring.rabbitmq.host}")
     private String rabbitmqHost;
 
@@ -30,10 +28,13 @@ public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.password}")
     private String rabbitmqPassword;
+
     @Value("${rabbitmq.queue.name}")
     private String queueName;
+
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
+
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
