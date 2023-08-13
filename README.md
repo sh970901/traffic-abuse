@@ -52,6 +52,7 @@
 현재 RequestsLimit은 5로 초기화된 상태 <br/>
 <br/>
 
+<br/><br/><br/><br/>
 1) 첫 요청의 경우 ( 1분 이전에 같은 요청이 없는 경우)
    1) 현재 정의해 둔 RequestsLimit(5) 이상을 1분동안 요청한 경우 Block 
    2) BlockTime이 0이 되기 전까지 block : true;
