@@ -1,12 +1,12 @@
 <h2>Anti-Abusing</h2>
-**배경**
+<p>배경</p>
 
 - 초 또는 분당 동일한 사용자의 동일한 수백번 이상의 요청을 비 정상접근(어뷰징)으로 판단
 - 이로 인한 불필요한 로그와 트레이싱, 서버 부하 등 과도한 사용에 대해 서비스를 보호해주는 수단 
 - 서비스의 가용성 확보를 위함 (API레벨, 네트워크 레벨, 컨테이너 레벨, CPU 레벨)
 - 모든 웹 또는 API에서 호출하여 사용할 수 있도록 공용 API 개발 목적
 
-**개발**
+<p>개발</p>
 
 - Ratelimiter 알고리즘을 활용한 접근 제어 API 개발
     - 분당 일정 횟수(RequestsLimit) 이상의 동일한 요청을 동일한 사용자 기준으로 제어
@@ -17,7 +17,7 @@
   - 웹 콘솔을 통해 RequestsLimit, BlackList, WhiteList, BlackUserAgent, WhiteUseragent, Keyword, notKeyword 제어 가능
 - 요청 값은 큐를 통해 실시간으로 Anti-Abusing 서비스에 반영
 
-**기타**
+<p>기타</p>
 - 각 요청마다 해당 API를 사용해야 하기에 적절한 ConnectionTimeout 설정 (0.2s)
 - NoSQL DB(Couchbase), 이벤트 큐 (RabbitMQ) 설치 필요
 
