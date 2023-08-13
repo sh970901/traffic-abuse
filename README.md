@@ -1,5 +1,8 @@
 <h2>Anti-Abusing</h2>
-<p>배경</p>
+
+---
+<h3>Introduction</h3>
+<p>개요</p>
 
 - 초 또는 분당 동일한 사용자의 동일한 수백번 이상의 요청을 비 정상접근(어뷰징)으로 판단
 - 이로 인한 불필요한 로그와 트레이싱, 서버 부하 등 과도한 사용에 대해 서비스를 보호해주는 수단 
@@ -7,6 +10,8 @@
 - 모든 웹 또는 API에서 호출하여 사용할 수 있도록 공용 API 개발 목적
 
 <p>개발</p>
+ 
+  - java 17, SpringBoot 3.1.0, couchbase, rabbitmq 
 
 - Ratelimiter 알고리즘을 활용한 접근 제어 API 개발
     - 분당 일정 횟수(RequestsLimit) 이상의 동일한 요청을 동일한 사용자 기준으로 제어
@@ -22,7 +27,28 @@
 - 각 요청마다 해당 API를 사용해야 하기에 적절한 ConnectionTimeout 설정 (0.2s)
 - NoSQL DB(Couchbase), 이벤트 큐 (RabbitMQ) 설치 필요
 
-<br/>
+---
+<h3>DownLoad</h3>
+1. git clone https://github.com/sh970901/TOTORO.git
+   1. Set an application.yml specific to your environment. 
+   2. Need to set the ENCRYPTKEY in the JVM options or Environment variables
+   3. com.totoro.AntiAbuse.tools.JasyptConfig class is retrieving the ENCRYPTKEY key using getEnv
+   4. Be used to encrypt the values you've configured in your application.yml.
+2. RabbitMQ
+   1. docker pull rabbitmq
+   2. docker run -d -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq
+   3. docker exec rabbitmq rabbitmq-plugins enable rabbitmq_management
+   4. console: localhost:15672 / user: guest / guest
+   5. https://registry.hub.docker.com/_/rabbitmq/
+3. Couchbase
+   1. docker pull couchbase
+   2. docker run -d --name db -p 8091-8096:8091-8096 -p 11210-11211:11210-11211 couchbase
+   3. console: localhost:8091
+   4. create 3 bucket / abuse_log, abuse_rule, abuse_limit
+   5. https://docs.couchbase.com/server/current/install/getting-started-docker.html
+
+
+
 
 ---
 <h3>Application Architecture</h3>
@@ -44,7 +70,7 @@ https://dev.to/satrobit/rate-limiting-using-the-sliding-window-algorithm-5fjn
 
 ---
 
-<h4> Response Data </h4>
+<h3> Response Data </h3>
 
     "resultCode": "상태 코드",
     "resultMessage": "상태 메시지",
@@ -55,7 +81,7 @@ https://dev.to/satrobit/rate-limiting-using-the-sliding-window-algorithm-5fjn
         "currentRate": "1분간 요청 비율 (RequestsLimit > currentRate ? Pass : Block)",
         "currentRemainRequests": "남은 요청 수"
     }
-}
+
 ---
 ex) RequestsLimit : 5 <br/>
 
