@@ -18,6 +18,7 @@
 - 요청 값은 큐를 통해 실시간으로 Anti-Abusing 서비스에 반영
 
 <p>기타</p>
+
 - 각 요청마다 해당 API를 사용해야 하기에 적절한 ConnectionTimeout 설정 (0.2s)
 - NoSQL DB(Couchbase), 이벤트 큐 (RabbitMQ) 설치 필요
 
@@ -54,16 +55,18 @@
 1) 첫 요청의 경우 ( 1분 이전에 같은 요청이 없는 경우)
    1) 현재 정의해 둔 RequestsLimit(5) 이상을 1분동안 요청한 경우 Block 
    2) BlockTime이 0이 되기 전까지 block : true;
-    ![first_command.gif](..%2F..%2F..%2F..%2FDocuments%2Ffirst_command.gif)
+    ![first_command](https://github.com/sh970901/TOTORO/assets/79374899/6b6ce944-4a6b-4108-afbf-53f60a8a6bb2)
+
 <br/><br/><br/><br/>
 2) 이전 요청이 있는 경우 ( 1분 이전에 같은 요청이 있는 경우 )
    1) currentRate 비율과 RequestsLimit(5)을 비교하여 Block을 결정
    2) currentRate 비율은 1분 전 요청과 현재 요청을 현재 초를 기준으로 비율을 계산 
-    ![second_command.gif](..%2F..%2F..%2F..%2FDocuments%2Fsecond_command.gif)
+    ![second_command](https://github.com/sh970901/TOTORO/assets/79374899/6bf60699-1c4e-4ce1-af41-6318e30fba43)
+
 <br/><br/><br/><br/>
 3) Rule ( BlackUserAgent에 Postman을 추가한 경우 )
    1) WhiteUserAgent, WhiteList(IP), Keyword: 로직을 타지 않고 PASS
    2) BlackUserAgent, BlackList(IP), notKeyWord: 로직을 타지 않고 Block
-    ![third.gif](..%2F..%2F..%2F..%2FDocuments%2Fthird.gif)
+    ![third](https://github.com/sh970901/TOTORO/assets/79374899/13bc3d29-ed8c-4913-a91e-7d30721ca289)
 
 ---
