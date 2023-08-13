@@ -29,6 +29,7 @@
 
 ---
 <h3>DownLoad</h3>
+
 1. git clone https://github.com/sh970901/TOTORO.git
    1. Set an application.yml specific to your environment. 
    2. Need to set the ENCRYPTKEY in the JVM options or Environment variables
@@ -52,6 +53,7 @@
 
 ---
 <h3>Application Architecture</h3>
+
 ![img.png](img/application-architecture.png)
 
 ---
