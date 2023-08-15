@@ -1,8 +1,8 @@
 package com.totoro.AntiAbuse.abusing.service;
 
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
-import com.totoro.AntiAbuse.core.rateLimiter.RateLimiter;
 import com.totoro.AntiAbuse.core.TotoroResponse;
+import com.totoro.AntiAbuse.core.rateLimiter.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface AbuseService<T> {

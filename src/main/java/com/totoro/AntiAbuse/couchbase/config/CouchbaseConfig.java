@@ -1,8 +1,8 @@
 package com.totoro.AntiAbuse.couchbase.config;
 
-import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
 import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.context.annotation.Bean;

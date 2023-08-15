@@ -45,7 +45,6 @@ public class AbuseLogDto {
                 .type(type)
                 .date(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .pcId(req.getPcId())
-                .fsId(req.getFsId())
                 .remoteAddr(req.getRemoteAddr())
                 .url(req.getUrl())
                 .userAgent(req.getUserAgent())

@@ -1,7 +1,7 @@
 package com.totoro.AntiAbuse.couchbase.domain;
 
-import com.totoro.AntiAbuse.tools.storage.Rule;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
+import com.totoro.AntiAbuse.tools.storage.Rule;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

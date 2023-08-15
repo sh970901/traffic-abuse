@@ -38,9 +38,9 @@ couchbase:
     password: ENC(93wqqZ9Gpug60fZc5TqO1OoBuVp1VCfb)
 
 rabbitmq:
-  queue.name: sample.queue
-  exchange.name: sample.exchange
-  routing.key: sample.key
+  queue.name: abuse.queue
+  exchange.name: abuse.exchange
+  routing.key: totoro
 
 logging:
   level:

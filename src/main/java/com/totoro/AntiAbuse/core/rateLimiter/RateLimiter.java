@@ -1,6 +1,5 @@
 package com.totoro.AntiAbuse.core.rateLimiter;
 
-import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import lombok.Builder;

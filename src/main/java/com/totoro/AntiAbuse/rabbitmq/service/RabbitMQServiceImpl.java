@@ -1,6 +1,6 @@
 package com.totoro.AntiAbuse.rabbitmq.service;
 
-import com.totoro.AntiAbuse.rabbitmq.dto.MessageDto;
+import com.totoro.AntiAbuse.rabbitmq.dto.RuleMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -23,20 +23,20 @@ public class RabbitMQServiceImpl implements RabbitMQService{
     /**
      * Queue로 메시지를 발행
      *
-     * @param messageDto 발행할 메시지의 DTO 객체
+     * @param ruleDto 발행할 메시지의 DTO 객체
      */
-    public void sendMessage(MessageDto messageDto) {
-        log.info("message sent: {}", messageDto.toString());
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, messageDto);
-    }
+//    public void sendMessage(RuleMessage ruleDto) {
+//        log.info("message sent: {}", ruleDto.toString());
+//        rabbitTemplate.convertAndSend(exchangeName, routingKey, ruleDto);
+//    }
 
     /**
      * Queue에서 메시지를 구독
      *
-     * @param messageDto 구독한 메시지를 담고 있는 MessageDto 객체
+     * @param ruleDto 구독한 메시지를 담고 있는 RuleMessage 객체
      */
     @RabbitListener(queues = "${rabbitmq.queue.name}")
-    public void receivedMessage(MessageDto messageDto) {
-        log.info("Received message: {}", messageDto.toString());
+    public void receivedMessage(RuleMessage ruleDto) {
+        log.info("Received message: {}", ruleDto.toString());
     }
 }

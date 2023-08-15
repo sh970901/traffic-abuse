@@ -10,7 +10,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AbuseRequestDto {
     private String pcId;
-    private String fsId;
     private String domain;
     private String url;
     private String userAgent;
@@ -19,19 +18,17 @@ public class AbuseRequestDto {
 
     public static AbuseRequestDto of(HttpServletRequest request){
         String pcId = null;
-        String fsId = null;
 
         Cookie[] cookies = request.getCookies();
         if(cookies != null){
             pcId = CookieUtils.getCookieValue(cookies,"pcid");
-            fsId = CookieUtils.getCookieValue(cookies,"fsid");
+            pcId = (pcId == null) ? request.getSession().getId() : pcId;
         }
-        return new AbuseRequestDto(pcId, fsId, request.getRemoteAddr(), request.getRequestURI(), request.getHeader("User-Agent"), request.getServerName());
+        return new AbuseRequestDto(pcId, request.getRemoteAddr(), request.getRequestURI(), request.getHeader("User-Agent"), request.getServerName());
     }
 
-    private AbuseRequestDto(String pcId, String fsId, String remoteAddr, String url, String userAgent, String domain) {
+    private AbuseRequestDto(String pcId, String remoteAddr, String url, String userAgent, String domain) {
         this.pcId = pcId;
-        this.fsId = fsId;
         this.remoteAddr = remoteAddr;
         this.url = url;
         this.userAgent = userAgent;
@@ -55,7 +52,6 @@ public class AbuseRequestDto {
     public String toString() {
         return "AbuseRequestDTO{" +
                 "pcId='" + pcId + '\'' +
-                ", fsId='" + fsId + '\'' +
                 ", domain='" + domain + '\'' +
                 ", url='" + url + '\'' +
                 ", userAgent='" + userAgent + '\'' +

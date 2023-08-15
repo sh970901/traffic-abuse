@@ -1,18 +1,17 @@
 package com.totoro.AntiAbuse.abusing.service;
 
-import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
-import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
-import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.abusing.dto.AbuseLogDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseRequestDto;
 import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
-import com.totoro.AntiAbuse.core.rateLimiter.RateLimiter;
 import com.totoro.AntiAbuse.core.TotoroResponse;
+import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
+import com.totoro.AntiAbuse.core.rateLimiter.RateLimiter;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
 import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
-import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
 import com.totoro.AntiAbuse.tools.storage.Rule;
-import com.totoro.AntiAbuse.utils.RequestUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -144,7 +143,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     }
 
     private Boolean isNullPcId(AbuseRequestDto req) {
-        return req.getFsId() != null && req.getPcId() == null;
+        return req.getPcId() == null;
     }
 
     private Boolean isBlackOrNullUser(AbuseRequestDto req) {
@@ -174,7 +173,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     }
 
     private Boolean isFirstVisit(AbuseRequestDto req) {
-        if (req.getPcId() == null && req.getFsId() == null) {
+        if (req.getPcId() == null) {
             AbuseLogDto logDto = AbuseLogDto.createNewLog(req, FIRST_VISIT);
 
             AbuseLogDocument logDocument = abuseLogService.getData(logDto.generateId());

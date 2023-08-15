@@ -1,6 +1,5 @@
 package com.totoro.AntiAbuse.tools.storage;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

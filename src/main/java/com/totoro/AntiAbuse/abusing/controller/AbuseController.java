@@ -18,7 +18,17 @@ public class AbuseController {
 
 
     @GetMapping("/test")
-    public TotoroResponse<AbuseResponseDto> tetCheckAbuse(HttpServletRequest request) throws Exception {
+    public TotoroResponse<AbuseResponseDto> testCheckAbuse(HttpServletRequest request) throws Exception {
+        String domain = request.getServerName();
+        String url = request.getRequestURI();
+        String userAgent = request.getHeader("User-Agent");
+        String remoteAddr = request.getRemoteAddr();
+        System.out.println("Domain: " + domain);
+        System.out.println("URL: " + url);
+        System.out.println("User Agent: " + userAgent);
+        System.out.println("Remote Address: " + remoteAddr);
+        System.out.println("Session " + request.getSession().getId());
+
         return abuseService.checkAbuse(request);
     }
 
@@ -27,7 +37,7 @@ public class AbuseController {
         return abuseService.checkAbuse(requestDTO);
     }
 
-    @PostMapping("/httpRequest")
+    @PostMapping("/hr")
     public TotoroResponse<AbuseResponseDto> httpCheckAbuse(@RequestBody HttpServletRequest request) throws Exception {
         return abuseService.checkAbuse(request);
     }
