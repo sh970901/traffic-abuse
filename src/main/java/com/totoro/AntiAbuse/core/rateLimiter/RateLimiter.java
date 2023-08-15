@@ -1,7 +1,7 @@
 package com.totoro.AntiAbuse.core.rateLimiter;
 
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
-import com.totoro.AntiAbuse.couchbase.service.CouchService;
+import com.totoro.AntiAbuse.couchbase.service.AbuseLimitService;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,11 +17,11 @@ public class RateLimiter {
     private final Duration windowSize = Duration.ofMinutes(1);
     private Map<String, Integer> urls = new HashMap<>();
 
-    private CouchService<AbuseLimitDocument> abuseLimitService;
+    private AbuseLimitService abuseLimitService;
 
     public void incrementKey(String key) throws Exception {
         LocalDateTime currentWindow = truncateToMinutes(LocalDateTime.now());
-        abuseLimitService.addData(new AbuseLimitDocument(key+"::"+currentWindow));
+        abuseLimitService.incKey(new AbuseLimitDocument(key+"::"+currentWindow));
     }
 
 

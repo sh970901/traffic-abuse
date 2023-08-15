@@ -24,4 +24,5 @@ public class RuleMessage {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, TotoroToStringStyle.simpleStyle());
     }
+
 }

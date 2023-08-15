@@ -1,5 +1,6 @@
 package com.totoro.AntiAbuse.couchbase.domain;
 
+import com.totoro.AntiAbuse.rabbitmq.dto.RuleMessage;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
 import com.totoro.AntiAbuse.tools.storage.Rule;
 import lombok.AllArgsConstructor;
@@ -34,5 +35,19 @@ public class AbuseRuleDocument implements Serializable {
 
     @Field
     private Blacklist blacklist;
+
+    public static AbuseRuleDocument[] convertMsgToDocument(RuleMessage msg){
+        AbuseRuleDocument rule = AbuseRuleDocument.builder()
+                .type("rule")
+                .rule(msg.getRule())
+                .build();
+
+        AbuseRuleDocument blacklist = AbuseRuleDocument.builder()
+                .type("blacklist")
+                .blacklist(msg.getBlacklist())
+                .build();
+
+        return new AbuseRuleDocument[]{rule, blacklist};
+    }
 
 }

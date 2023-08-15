@@ -1,27 +1,9 @@
 package com.totoro.AntiAbuse.couchbase.service;
 
 import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
-import com.totoro.AntiAbuse.couchbase.repository.AbuseRuleRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class AbuseRuleService implements CouchService<AbuseRuleDocument> {
-    private final AbuseRuleRepository abuseRuleRepository;
+public interface AbuseRuleService extends CouchService<AbuseRuleDocument>{
 
-    @Override
-    public void addData(AbuseRuleDocument data) {
-        abuseRuleRepository.save(data);
-    }
+    void upsertRule(AbuseRuleDocument rule);
 
-    @Override
-    public AbuseRuleDocument getData(String id) {
-        return abuseRuleRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public AbuseRuleDocument saveForce(AbuseRuleDocument data) {
-        return null;
-    }
 }

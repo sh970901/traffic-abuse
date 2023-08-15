@@ -1,8 +1,9 @@
 package com.totoro.AntiAbuse.abusing.dto;
 
-import com.couchbase.client.core.deps.com.google.gson.JsonObject;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
+import com.totoro.AntiAbuse.utils.TotoroToStringStyle;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,8 +54,9 @@ public class AbuseLogDto {
                 .build();
     }
 
-    public String toJson() {
-        return String.valueOf(new JsonObject());
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, TotoroToStringStyle.simpleStyle());
     }
 
     public AbuseLogDto convertDocumentToDto(AbuseLogDocument logDocument){

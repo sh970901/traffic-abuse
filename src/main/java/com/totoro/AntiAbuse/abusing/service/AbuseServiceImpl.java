@@ -6,10 +6,11 @@ import com.totoro.AntiAbuse.abusing.dto.AbuseResponseDto;
 import com.totoro.AntiAbuse.core.TotoroResponse;
 import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
 import com.totoro.AntiAbuse.core.rateLimiter.RateLimiter;
-import com.totoro.AntiAbuse.couchbase.domain.AbuseLimitDocument;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseLogDocument;
 import com.totoro.AntiAbuse.couchbase.domain.AbuseRuleDocument;
-import com.totoro.AntiAbuse.couchbase.service.CouchService;
+import com.totoro.AntiAbuse.couchbase.service.AbuseLimitService;
+import com.totoro.AntiAbuse.couchbase.service.AbuseLogService;
+import com.totoro.AntiAbuse.couchbase.service.AbuseRuleService;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
 import com.totoro.AntiAbuse.tools.storage.Rule;
 import jakarta.annotation.PostConstruct;
@@ -30,9 +31,9 @@ import static com.totoro.AntiAbuse.utils.RequestUtils.*;
 public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     //Todo RateLimiters rule 인스턴스 재활용
 
-    private final CouchService<AbuseLogDocument> abuseLogService;
-    private final CouchService<AbuseRuleDocument> abuseRuleService;
-    private final CouchService<AbuseLimitDocument> abuseLimitService;
+    private final AbuseLogService abuseLogService;
+    private final AbuseRuleService abuseRuleService;
+    private final AbuseLimitService abuseLimitService;
     private static Map<String, RateLimiter> rateLimiters = new HashMap<>();
     private static int firstVisitLimit = 20;
     @Override
@@ -48,15 +49,15 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
     @Override
     public RateLimiter updateRule() {
-        AbuseRuleDocument abuseRule = abuseRuleService.getData("rule");
-        int requestsLimit = abuseRule.getRule().getRequestsLimit();
+        AbuseRuleDocument ruleDoc = abuseRuleService.getData("rule");
+        int requestsLimit = ruleDoc.getRule().getRequestsLimit();
 
         // rule document에 정의된 값으로 업데이트
         RateLimiter commonRateLimiter = RateLimiter.builder().requestsLimit(requestsLimit).abuseLimitService(abuseLimitService).build();
         rateLimiters.put("common", commonRateLimiter);
-        blackUserAgent = abuseRule.getRule().getBlackUserAgent();
-        whiteUserAgent = abuseRule.getRule().getWhiteUserAgent();
-        firstVisitLimit = abuseRule.getRule().getFirstVisitLimit();
+        blackUserAgent = ruleDoc.getRule().getBlackUserAgent();
+        whiteUserAgent = ruleDoc.getRule().getWhiteUserAgent();
+        firstVisitLimit = ruleDoc.getRule().getFirstVisitLimit();
 
         log.info("updateRule");
         return commonRateLimiter;
@@ -64,17 +65,17 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
     @Override
     public void updateBlackList() {
-        AbuseRuleDocument abuseRule = abuseRuleService.getData("blacklist");
-        memberIds = abuseRule.getBlacklist().getMemberIds();
-        ipAddress = abuseRule.getBlacklist().getIpAddress();
+        AbuseRuleDocument ruleDoc = abuseRuleService.getData("blacklist");
+        memberIds = ruleDoc.getBlacklist().getMemberIds();
+        ipAddress = ruleDoc.getBlacklist().getIpAddress();
         log.info("updateBlackList");
     }
 
     @PostConstruct
     private void init() {
         //TODO 값을 넣어줄 때는 DTO를 사용하도록 수정
-        abuseRuleService.addData(AbuseRuleDocument.builder().type("rule").rule(new Rule(5, whiteUserAgent, blackUserAgent)).build());
-        abuseRuleService.addData(AbuseRuleDocument.builder().type("blacklist").blacklist(new Blacklist(ipAddress, memberIds)).build());
+        abuseRuleService.save(AbuseRuleDocument.builder().type("rule").rule(new Rule(5, whiteUserAgent, blackUserAgent)).build());
+        abuseRuleService.save(AbuseRuleDocument.builder().type("blacklist").blacklist(new Blacklist(ipAddress, memberIds)).build());
 //        abuseLimitService.addData(new AbuseLimitDocument("1","2","3","4",5));
 //        abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(AbuseLogDto.createNewLog(requestDTO, "example2")));
     }
@@ -90,7 +91,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         if(isBlackOrNullUser(req)){
             AbuseLogDto dto = AbuseLogDto.createNewLog(req, req.getUserAgent());
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            abuseLogService.save(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, BLACKUSERAGENT))
                                     .build();
@@ -98,7 +99,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         if(!isValidIPAddress(req.getRemoteAddr())){
             AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            abuseLogService.save(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                                     .data(AbuseResponseDto.abuse(null, IP_WRONG))
                                     .build();
@@ -111,13 +112,13 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         }
 
 //      IE bug로 발생하는 케이스 절대 다수라 로그 남기지 않아도 될듯..
-        if(isNullPcId(req)){
-            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-            return TotoroResponse.<AbuseResponseDto>from()
-                                   .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
-                                   .build();
-        }
+//        if(isNullPcId(req)){
+//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, UNUSUAL_ID);
+//            abuseLogService.save(AbuseLogDocument.convertDtoToDocument(dto));
+//            return TotoroResponse.<AbuseResponseDto>from()
+//                                   .data(AbuseResponseDto.nonAbuse(null, UNUSUAL_ID))
+//                                   .build();
+//        }
         //TODO BlackList 접근 차단 추가로직 필요
 
 
@@ -126,7 +127,7 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
 
         if (limitStatus.isLimited()) {
             AbuseLogDto dto = AbuseLogDto.createNewLog(req, "Limited");
-            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            abuseLogService.save(AbuseLogDocument.convertDtoToDocument(dto));
             return TotoroResponse.<AbuseResponseDto>from()
                     .data(AbuseResponseDto.abuse(Long.toString(limitStatus.getLimitDuration().toMillis()),"Limited"))
                     .build();
@@ -176,25 +177,29 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
         if (req.getPcId() == null) {
             AbuseLogDto logDto = AbuseLogDto.createNewLog(req, FIRST_VISIT);
 
-            AbuseLogDocument logDocument = abuseLogService.getData(logDto.generateId());
-            if (logDocument != null) {
-                if (logDocument.getCount() > firstVisitLimit) {
-                    //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 firstVisitLimit을 넘길 경우
-                    logDto.setCount(firstVisitLimit);
-                    // count 초기화 한 값을 다시 저장해야하나?
-                    abuseLogService.saveForce(AbuseLogDocument.convertDtoToDocument(logDto));
-                    return false;
-                } else {
-                    abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(logDto));
-                    return true;
-                }
+            AbuseLogDocument logDoc= abuseLogService.getData(logDto.generateId());
+            if (logDoc != null) {
+                return processIfExceedsLimit(logDoc, logDto);
             } else {
-                abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(logDto));
+                abuseLogService.saveCount(AbuseLogDocument.convertDtoToDocument(logDto));
                 return true;
                 //첫번째 방문에 pcId와 fsId가 둘 다 null 인 케이스
             }
         }
         return true;
+    }
+
+    private Boolean processIfExceedsLimit(AbuseLogDocument logDoc, AbuseLogDto logDto){
+        if (logDoc.getCount() > firstVisitLimit) {
+            //계속 pcId와 fsId가 null로 요청이 오는데 이 count가 firstVisitLimit을 넘길 경우
+            logDto.setCount(firstVisitLimit);
+            // count 초기화 한 값을 다시 저장해야하나?
+            abuseLogService.save(AbuseLogDocument.convertDtoToDocument(logDto));
+            return false;
+        } else {
+            abuseLogService.saveCount(AbuseLogDocument.convertDtoToDocument(logDto));
+            return true;
+        }
     }
 
 
