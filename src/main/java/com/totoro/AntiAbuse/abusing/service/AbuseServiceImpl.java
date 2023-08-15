@@ -12,6 +12,7 @@ import com.totoro.AntiAbuse.couchbase.service.CouchService;
 import com.totoro.AntiAbuse.tools.storage.Blacklist;
 import com.totoro.AntiAbuse.core.rateLimiter.LimitStatus;
 import com.totoro.AntiAbuse.tools.storage.Rule;
+import com.totoro.AntiAbuse.utils.RequestUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,6 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
     @Override
     public TotoroResponse<AbuseResponseDto> checkAbuse(HttpServletRequest request) throws Exception {
         AbuseRequestDto requestDTO = AbuseRequestDto.of(request);
-        System.out.println("11112333331"+request.getHeader("User-Agent"));
         return check(requestDTO);
     }
 
@@ -97,13 +97,13 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
                                     .build();
         }
 
-//        if(!ipValidCheck(req)){
-//            AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
-//            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
-//            return TotoroResponse.<AbuseResponseDto>from()
-//                                    .data(AbuseResponseDto.abuse(null, IP_WRONG))
-//                                    .build();
-//        }
+        if(!isValidIPAddress(req.getRemoteAddr())){
+            AbuseLogDto dto = AbuseLogDto.createNewLog(req, IP_WRONG);
+            abuseLogService.addData(AbuseLogDocument.convertDtoToDocument(dto));
+            return TotoroResponse.<AbuseResponseDto>from()
+                                    .data(AbuseResponseDto.abuse(null, IP_WRONG))
+                                    .build();
+        }
 
         if (!isFirstVisit(req)){
             return TotoroResponse.<AbuseResponseDto>from()
@@ -139,13 +139,8 @@ public class  AbuseServiceImpl implements AbuseService<AbuseResponseDto>{
                     .build();
         }
     }
-    private boolean ipValidCheck(AbuseRequestDto req) {
-        String fsId = req.getFsId();
-        if (req.getPcId() != null && fsId != null && fsId.length() == 20) {
-            String ipAddress = fsId.substring(6, 14);
-            return isIpv4Net(ipAddress);
-        }
-        return false;
+    private boolean isValidIP(String ipAddress) {
+        return isValidIPAddress(ipAddress);
     }
 
     private Boolean isNullPcId(AbuseRequestDto req) {

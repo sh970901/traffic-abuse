@@ -7,34 +7,29 @@ import com.totoro.AntiAbuse.core.TotoroResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/v2")
+@RequestMapping(value = "/v1/check-abuse")
 @RequiredArgsConstructor
 @Slf4j
 public class AbuseController {
     private final AbuseService<AbuseResponseDto> abuseService;
 
 
-    @PostMapping("/check-abuse")
-    public TotoroResponse<AbuseResponseDto> httpCheckAbuse(HttpServletRequest request) throws Exception {
+    @GetMapping("/test")
+    public TotoroResponse<AbuseResponseDto> tetCheckAbuse(HttpServletRequest request) throws Exception {
         return abuseService.checkAbuse(request);
     }
 
-    @PostMapping("/check-abuse2")
+    @PostMapping("/pcId")
     public TotoroResponse<AbuseResponseDto> dtoCheckAbuse(AbuseRequestDto requestDTO) throws Exception {
         return abuseService.checkAbuse(requestDTO);
     }
 
-    @PostMapping("/update/rule")
-    public TotoroResponse<AbuseResponseDto> updateRule() throws Exception {
-        abuseService.updateRule();
-        return TotoroResponse.<AbuseResponseDto>from().build();
+    @PostMapping("/httpRequest")
+    public TotoroResponse<AbuseResponseDto> httpCheckAbuse(@RequestBody HttpServletRequest request) throws Exception {
+        return abuseService.checkAbuse(request);
     }
-
 
 }

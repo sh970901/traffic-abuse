@@ -1,6 +1,7 @@
 package com.totoro.AntiAbuse.utils;
 
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Instant;
@@ -42,6 +43,20 @@ public class RequestUtils {
             return inetAddress instanceof Inet4Address;
         } catch (UnknownHostException e) {
             return false;
+        }
+    }
+    public static boolean isValidIPAddress(String ipAddress) {
+        try {
+            InetAddress inetAddress = InetAddress.getByName(ipAddress);
+
+            if (inetAddress instanceof Inet4Address || inetAddress instanceof Inet6Address) {
+                // 추가적인 유효성 검사 (옵션)
+                return true;
+            } else {
+                return false;
+            }
+        } catch (UnknownHostException e) {
+            return false; // 예외 처리를 통해 정상적이지 않은 IP 주소도 처리
         }
     }
 
