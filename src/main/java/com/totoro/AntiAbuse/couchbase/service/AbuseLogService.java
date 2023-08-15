@@ -29,6 +29,7 @@ public class AbuseLogService implements CouchService<AbuseLogDocument> {
         return logRepository.findById(id).orElse(null);
     }
 
+    @Override
     public AbuseLogDocument saveForce(AbuseLogDocument logDocument){
         return logRepository.save(logDocument);
     }

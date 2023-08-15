@@ -18,7 +18,7 @@ public class RequestUtils {
 
     public static List<String> blackUserAgent = Arrays.asList(
             "scrapy", "Java", "python", "Apache-HttpClient",
-            "The Knowledge AI", "Snoopy", "Postman"
+            "The Knowledge AI", "Snoopy"
     );
     public static List<String> ipAddress = Arrays.asList(
             "10.0.0.1"

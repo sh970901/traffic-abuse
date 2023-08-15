@@ -33,7 +33,7 @@
 1. git clone https://github.com/sh970901/TOTORO.git
    1. Set an application.yml specific to your environment. 
    2. Need to set the ENCRYPTKEY in the JVM options or Environment variables
-   3. com.totoro.AntiAbuse.tools.JasyptConfig class is retrieving the ENCRYPTKEY key using getEnv
+   3. com.totoro.AntiAbuse.tools.JasyptConfig class is retrieving the ENCRYPTKEY key using getEnv()
    4. Be used to encrypt the values you've configured in your application.yml.
 2. RabbitMQ
    1. docker pull rabbitmq

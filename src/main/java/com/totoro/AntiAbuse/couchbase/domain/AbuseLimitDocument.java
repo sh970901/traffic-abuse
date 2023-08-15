@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Document(expiry = 120)
 public class AbuseLimitDocument implements Serializable {
     private static final long serialVersionUID = 7330101127517450935L;
 
