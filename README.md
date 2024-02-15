@@ -29,7 +29,8 @@
 
 ---
 <h3>DownLoad</h3>
-
+<br/>
+<h4>Using Docker</h4> 
 1. git clone https://github.com/sh970901/TOTORO.git
    1. Set an application.yml specific to your environment. 
    2. Need to set the ENCRYPTKEY in the JVM options or Environment variables
@@ -48,7 +49,36 @@
    4. create 3 buckets / abuse_log, abuse_rule, abuse_limit
    5. https://docs.couchbase.com/server/current/install/getting-started-docker.html
 
+<h4> Using Docker Compose </h4>
+1. docker-compose.yml
+```jsx
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    container_name: rabbitmq
+    command: rabbitmq-plugins enable rabbitmq_management
 
+  couchbase:
+    image: couchbase
+    ports:
+      - "8091-8096:8091-8096"
+      - "11210-11211:11210-11211"
+    container_name: db
+    environment:
+      - COUCHBASE_ADMINISTRATOR_USERNAME=admin
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=adminpassword
+    command: bash -c 'sleep 15 && /entrypoint.sh couchbase-server &'
+
+    healthcheck:
+      test: ["CMD", "couchbase-cli", "ping", "-c", "1", "--wait", "10", "--username", "admin", "--password", "adminpassword", "--cluster", "localhost:8091"]
+
+    depends_on:
+      - rabbitmq
+```
 
 
 ---
