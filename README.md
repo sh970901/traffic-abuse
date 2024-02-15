@@ -29,29 +29,38 @@
 
 ---
 <h3>DownLoad</h3>
-<br/>
-<h4>Using Docker</h4> 
+
+```
 1. git clone https://github.com/sh970901/TOTORO.git
-   1. Set an application.yml specific to your environment. 
-   2. Need to set the ENCRYPTKEY in the JVM options or Environment variables
-   3. com.totoro.AntiAbuse.tools.JasyptConfig class is retrieving the ENCRYPTKEY key using getEnv()
-   4. Be used to encrypt the values you've configured in your application.yml.
+    1. Set an application.yml specific to your environment.
+    2. Need to set the ENCRYPTKEY in the JVM options or Environment variables
+    3. com.totoro.AntiAbuse.tools.JasyptConfig class is retrieving the ENCRYPTKEY key using getEnv()
+    4. Be used to encrypt the values you've configured in your application.yml.
+```
+
+<h4>Using Docker</h4> 
+
+```
 2. RabbitMQ
-   1. docker pull rabbitmq
-   2. docker run -d -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq
-   3. docker exec rabbitmq rabbitmq-plugins enable rabbitmq_management
-   4. console: localhost:15672, Login : guest / guest
-   5. https://registry.hub.docker.com/_/rabbitmq/
+    1. docker pull rabbitmq
+    2. docker run -d -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq
+    3. docker exec rabbitmq rabbitmq-plugins enable rabbitmq_management
+    4. console: localhost:15672, Login : guest / guest
+    5. https://registry.hub.docker.com/_/rabbitmq/
+```
+```
 3. Couchbase
-   1. docker pull couchbase
-   2. docker run -d --name db -p 8091-8096:8091-8096 -p 11210-11211:11210-11211 couchbase
-   3. console: localhost:8091
-   4. create 3 buckets / abuse_log, abuse_rule, abuse_limit
-   5. https://docs.couchbase.com/server/current/install/getting-started-docker.html
+    1. docker pull couchbase
+    2. docker run -d --name db -p 8091-8096:8091-8096 -p 11210-11211:11210-11211 couchbase
+    3. console: localhost:8091
+    4. create 3 buckets / abuse_log, abuse_rule, abuse_limit
+    5. https://docs.couchbase.com/server/current/install/getting-started-docker.html
+```
 
 <h4> Using Docker Compose </h4>
 1. docker-compose.yml
-```jsx
+
+```
 version: '3'
 services:
   rabbitmq:
