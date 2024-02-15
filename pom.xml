@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.totoro</groupId>
 	<artifactId>AntiAbuse</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>AntiAbuse</name>
 	<description>AntiAbuse</description>
 	<properties>
@@ -97,6 +97,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>totoro-antiabuse</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
