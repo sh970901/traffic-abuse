@@ -1,4 +1,8 @@
-<h2>Anti-Abusing</h2>
+
+트래픽 제어기는 하단 참고 </br>
+<a href="https://github.com/sh970901/traffic-limiter">트래픽 제어기(유입 제어)</a>
+
+<h2>Anti-Abusing</h2> (어뷰징 차단기)
 
 ---
 <h3>Introduction</h3>
